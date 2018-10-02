@@ -62,7 +62,7 @@ end
     reg [1:0] counter_position;
     
     always @(posedge clk160) begin
-      if(strip_data_in[29:26] == 4'b1100 && head_before != 4'b1100) begin
+      if(strip_data_in[29:26] == 4'b1010 && head_before != 4'b1010) begin
           counter_position <= counter;
       end
     end    
@@ -72,7 +72,7 @@ end
     always @(posedge clk160) begin
         if(counter== counter_position+2'b01) begin
             frmdata_r <= frmdata;
-            data_valid <= 1'b1;
+            data_valid <= head_before==4'b1010;
         end else begin
             data_valid <=1'b0;
         end

@@ -133,7 +133,7 @@ module GTP_Wrapper(
    );
       
         
-    gtx_tds_4p8G  gtx_tds_4p8G_inst
+    gtx_tds_4p8G_X0Y8  gtx_tds_4p8G_inst
     (
      .soft_reset_tx_in(soft_reset_tx_in), // input wire soft_reset_tx_in
      .soft_reset_rx_in(soft_reset_rx_in), // input wire soft_reset_rx_in
