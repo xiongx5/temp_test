@@ -28,7 +28,10 @@ module check_strip_data
     output reg linked,
     output reg [3:0]  state,
     output reg [9:0]  syn_cnt,
-    output reg [4:0]  err_cnt
+    output reg [4:0]  err_cnt,
+
+    output reg data_valid,
+    output [103:0] data_out
 
 //    output [103:0] frame_data,
 //    output frame_data_valid
@@ -68,7 +71,7 @@ end
     end    
 
     reg [103:0] frmdata_r=104'b0;
-    reg data_valid=1'b0;
+
     always @(posedge clk160) begin
         if(counter== counter_position+2'b01) begin
             frmdata_r <= frmdata;
@@ -77,20 +80,21 @@ end
             data_valid <=1'b0;
         end
     end
+    assign data_out =  frmdata_r;
 //assign frame_data = frmdata_r;
 //assign frame_data_valid = data_valid;
 
-ila_strip_data_check ila_strip_data_check_inst (
-  .clk(clk160), // input wire clk
-  .probe0(strip_data_in), // input wire 30 probe0
-  .probe1(link_message), // input wire 19 probe1
-  .probe2(frmdata),//104
-  .probe3(head_before),//4
-  .probe4(counter),//2
-  .probe5(counter_position),//2
-  .probe6(data_valid),//1
-  .probe7(frmdata_r)//104
-);
+//ila_strip_data_check ila_strip_data_check_inst (
+//  .clk(clk160), // input wire clk
+//  .probe0(strip_data_in), // input wire 30 probe0
+//  .probe1(link_message), // input wire 19 probe1
+//  .probe2(frmdata),//104
+//  .probe3(head_before),//4
+//  .probe4(counter),//2
+//  .probe5(counter_position),//2
+//  .probe6(data_valid),//1
+//  .probe7(frmdata_r)//104
+//);
 
 // wire clear_link_error;
 // wire clear_link_error_VIO;

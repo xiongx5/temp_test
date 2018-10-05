@@ -65,10 +65,7 @@ wire data_clk;
     .gt0_rx_system_reset_c(gt0_rx_system_reset_c)
     );
 
-wire strip_linked;
-wire [3:0] strip_state;
-wire [9:0] strip_syn_cnt;
-wire [4:0] strip_err_cnt;
+
 wire [29:0]strip_data;
 wire [18:0] strip_link_message;
 deserial_strip_data  deserial_strip_data_inst(
@@ -88,10 +85,14 @@ check_strip_data   check_strip_data_inst(
     .strip_data_in(strip_data),
     .link_message(strip_link_message),
 
-    .linked(strip_linked),
-    .state(strip_state),
-    .syn_cnt(strip_syn_cnt),
-    .err_cnt(strip_err_cnt)
+    .linked(),
+    .state(),
+    .syn_cnt(),
+    .err_cnt(),
+
+    .data_valid(),
+    .data_out()
+
 );
 
 
@@ -99,10 +100,7 @@ check_strip_data   check_strip_data_inst(
 wire [115:0]pad_data;
 wire pad_data_valid;
 wire [18:0] pad_link_message;
-wire pad_linked;
-wire [3:0] pad_state;
-wire [9:0] pad_syn_cnt;
-wire [4:0] pad_err_cnt;
+
 
 deserial_pad_data  deserial_pad_data_inst(
     // User Interface
@@ -124,10 +122,14 @@ check_pad_data  check_pad_data_inst(
     .pad_data_valid(pad_data_valid),
     .link_message(pad_link_message),
 
-    .linked(pad_linked),
-    .state(pad_state),
-    .syn_cnt(pad_syn_cnt),
-    .err_cnt(pad_err_cnt)
+    .linked(),
+    .state(),
+    .syn_cnt(),
+    .err_cnt(),
+
+    .data_valid(),
+    .data_out()
+
 );
 
 reset_VIO reset_VIO_top (

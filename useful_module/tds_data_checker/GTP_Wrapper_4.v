@@ -338,18 +338,18 @@ module GTP_Wrapper_4(
 //     .probe_out1(debug_data_in),  // output wire [31 : 0] probe_out1
 //     .probe_out2(debug_k)  // output wire [3 : 0] probe_out2
 //   );
-   ila_GTX_4 ila_GTX_inst (
-       .clk(gt0_rxusrclk2_out), // input wire clk
+//   ila_GTX_4 ila_GTX_inst (
+//       .clk(gt0_rxusrclk2_out), // input wire clk
    
    
-       .probe0(gt0_rxdata_out), // input wire [19:0]  probe0  
-       .probe1(gt1_rxdata_out), // input wire [19:0]  probe0  
-       .probe2(gt2_rxdata_out), // input wire [19:0]  probe0  
-       .probe3(gt3_rxdata_out) // input wire [19:0]  probe0  
-//       .probe1(gt0_rxcharisk_out), // input wire [3:0]  probe1 
-//       .probe2(gt0_rxdisperr_out), // input wire [3:0]  probe2 
-//       .probe3(gt0_rxnotintable_out) // input wire [3:0]  probe3 
-   );
+//       .probe0(gt0_rxdata_out), // input wire [19:0]  probe0  
+//       .probe1(gt1_rxdata_out), // input wire [19:0]  probe0  
+//       .probe2(gt2_rxdata_out), // input wire [19:0]  probe0  
+//       .probe3(gt3_rxdata_out) // input wire [19:0]  probe0  
+////       .probe1(gt0_rxcharisk_out), // input wire [3:0]  probe1 
+////       .probe2(gt0_rxdisperr_out), // input wire [3:0]  probe2 
+////       .probe3(gt0_rxnotintable_out) // input wire [3:0]  probe3 
+//   );
 
    wire gt0_tx_mmcm_lock_out,gt1_tx_mmcm_lock_out, gt2_tx_mmcm_lock_out, gt3_tx_mmcm_lock_out;
 

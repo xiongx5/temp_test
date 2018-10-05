@@ -1,7 +1,7 @@
 //==================================================================================================
-//  Filename      : check_data_4.v
-//  Created On    : 2018-10-01 10:22:29
-//  Last Modified : 2018-10-03 17:43:43
+//  Filename      : channel_data_4.v
+//  Created On    : 2018-10-03 17:51:38
+//  Last Modified : 2018-10-05 10:31:20
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -14,11 +14,14 @@
 
 `timescale 1ns / 1ps
 
-module check_data_4(
-    input clk_in_40M_p,
-    input clk_in_40M_n,
+module channel_data_4(
     input GTP_CLK_p,
     input GTP_CLK_n,
+
+    input clk40,
+    input clk160,
+    input reset,
+    input [3:0] enable,
     //input GTX_reset,
     input serial_data_in_p_0,
     input serial_data_in_n_0,
@@ -36,41 +39,48 @@ module check_data_4(
 	//output [9:0] syn_cnt,
 	//output [4:0] err_cnt
 
+    input tds_mode,
+    output [3:0] channel_linked,
+
     input channel_fifo_s_reset_0,
     input data_tran_stop_0,
     input channel_data_read_0,
     output [119:0] channel_data_0,    
     output [9:0] channel_data_counter_0,
+    output channel_fifo_empty_0,
 
     input channel_fifo_s_reset_1,
     input data_tran_stop_1,
     input channel_data_read_1,
     output [119:0] channel_data_1,    
     output [9:0] channel_data_counter_1,
+    output channel_fifo_empty_1,
 
     input channel_fifo_s_reset_2,
     input data_tran_stop_2,
     input channel_data_read_2,
     output [119:0] channel_data_2,    
     output [9:0] channel_data_counter_2,
+    output channel_fifo_empty_2,
 
     input channel_fifo_s_reset_3,
     input data_tran_stop_3,
     input channel_data_read_3,
     output [119:0] channel_data_3,    
-    output [9:0] channel_data_counter_3
+    output [9:0] channel_data_counter_3,
+    output channel_fifo_empty_3
     );
-wire clk160;
-wire clk40;
+// wire clk160;
+// wire clk40;
 
-  clock_master clock_master_inst
-   (
-   // Clock in ports
-    .clk_in1_p(clk_in_40M_p),    // input clk_in1_p
-    .clk_in1_n(clk_in_40M_n),    // input clk_in1_n
-    // Clock out ports
-    .clk_out1(clk40),     // output clk_out1
-    .clk_out2(clk160));    // output clk_out2
+//   clock_master clock_master_inst
+//    (
+//    // Clock in ports
+//     .clk_in1_p(clk_in_40M_p),    // input clk_in1_p
+//     .clk_in1_n(clk_in_40M_n),    // input clk_in1_n
+//     // Clock out ports
+//     .clk_out1(clk40),     // output clk_out1
+//     .clk_out2(clk160));    // output clk_out2
 
 
 
@@ -121,7 +131,7 @@ wire data_clk_0,data_clk_1,data_clk_2,data_clk_3;
 // wire [119:0] pad_data_3,pad_data_2,pad_data_1,pad_data_0;
 // wire pad_empty_3,pad_empty_2,pad_empty_1,pad_empty_0;
 // wire data_read_enable_3,data_read_enable_2,data_read_enable_1,data_read_enable_0;
-
+wire [3:0] strip_linked,pad_linked;
 
 strip_pad_data_decoder strip_pad_data_decoder_inst[3:0](
     .GTP_data_in({GTP_data_out_3,GTP_data_out_2,GTP_data_out_1,GTP_data_out_0}),
@@ -129,6 +139,8 @@ strip_pad_data_decoder strip_pad_data_decoder_inst[3:0](
     .data_reset({gt3_rx_system_reset_c,gt2_rx_system_reset_c,gt1_rx_system_reset_c,gt0_rx_system_reset_c}),
     .clk_readout(clk160),
     .reset(reset),
+    .tds_mode(tds_mode),
+    .enable(enable),
 
     .strip_linked(strip_linked),
     .pad_linked(pad_linked),
@@ -143,15 +155,10 @@ strip_pad_data_decoder strip_pad_data_decoder_inst[3:0](
     .data_tran_stop({data_tran_stop_3,data_tran_stop_2,data_tran_stop_1,data_tran_stop_0}),
     .channel_data({channel_data_3,channel_data_2,channel_data_1,channel_data_0}),
     .channel_data_read({channel_data_read_3,channel_data_read_2,channel_data_read_1,channel_data_read_0}),
-    .channel_data_counter({channel_data_counter_3,channel_data_counter_2,channel_data_counter_1,channel_data_counter_0})
-
-
+    .channel_data_counter({channel_data_counter_3,channel_data_counter_2,channel_data_counter_1,channel_data_counter_0}),
+    .channel_fifo_empty({channel_fifo_empty_3,channel_fifo_empty_2,channel_fifo_empty_1,channel_fifo_empty_0})
     );
+assign channel_linked = tds_mode ? strip_linked : pad_linked;
 
-
-reset_VIO reset_VIO_top (
-  .clk(clk160),                // input wire clk
-  .probe_out0(reset)  // output wire [0 : 0] probe_out0
-);
 
 endmodule

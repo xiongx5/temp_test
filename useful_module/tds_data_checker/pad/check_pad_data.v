@@ -25,11 +25,13 @@ module check_pad_data
     input pad_data_valid,
     input [18:0] link_message,
 
-
     output linked,
     output [3:0] state,
     output [9:0] syn_cnt,
-    output [4:0] err_cnt
+    output [4:0] err_cnt,
+
+    output data_valid,
+    output [115:0] data_out
 );
 
 assign err_cnt = link_message[4:0];
@@ -39,14 +41,16 @@ assign state = link_message[18:15];
 wire hit_flag;
 assign hit_flag = |pad_data_in[103:0];
 wire [11:0] BCID;
-assign BCID= pad_data_in[115:104]; 
+assign BCID= pad_data_in[115:104];
+assign  data_valid = hit_flag&pad_data_valid;
+assign  data_out= pad_data_in;
 ila_pad_data_check ila_pad_data_check_inst (
-  .clk(clk160), // input wire clk
-  .probe0(pad_data_in), // input wire 116 probe0
-  .probe1(link_message), // input wire 19 probe1
-  .probe2(hit_flag),//1
-  .probe3(BCID),//12
-  .probe4(pad_data_valid)
+ .clk(clk160), // input wire clk
+ .probe0(pad_data_in), // input wire 116 probe0
+ .probe1(link_message), // input wire 19 probe1
+ .probe2(hit_flag),//1
+ .probe3(BCID),//12
+ .probe4(pad_data_valid)
 );
 
 
