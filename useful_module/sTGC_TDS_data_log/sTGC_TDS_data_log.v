@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-05 10:47:43
+//  Last Modified : 2018-10-05 13:56:29
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -47,25 +47,25 @@ module sTGC_TDS_data_log(
     input         rgmii_rxc
 );
 
-wire clk160;
-wire clk40;
-
-wire [47:0] D_MAC_add_VIO;
-wire [47:0] S_MAC_add_VIO;
-wire [11:0] counter_th_VIO;
-wire [11:0] idle_counter_number_th_VIO;
-
-clock_master clock_master_inst(
- // Clock in ports
-  .clk_in1_p(clk_in_40M_p),    // input clk_in1_p
-  .clk_in1_n(clk_in_40M_n),    // input clk_in1_n
-  // Clock out ports
-  .clk_out1(clk40),     // output clk_out1
-  .clk_out2(clk160));    // output clk_out2
-
-wire reset_VIO;
-wire TDS_mode_VIO; //0 for pad mode, 1 for srtrip mode
-wire [3:0] enable_VIO;
+	wire clk160;
+	wire clk40;
+	
+	wire [47:0] D_MAC_add_VIO;
+	wire [47:0] S_MAC_add_VIO;
+	wire [11:0] counter_th_VIO;
+	wire [11:0] idle_counter_number_th_VIO;
+	
+	clock_master clock_master_inst(
+	 // Clock in ports
+	  .clk_in1_p(clk_in_40M_p),    // input clk_in1_p
+	  .clk_in1_n(clk_in_40M_n),    // input clk_in1_n
+	  // Clock out ports
+	  .clk_out1(clk40),     // output clk_out1
+	  .clk_out2(clk160));    // output clk_out2
+	
+	wire reset_VIO;
+	wire TDS_mode_VIO; //0 for pad mode, 1 for srtrip mode
+	wire [3:0] enable_VIO;
     wire channel_fifo_s_reset_0;
     wire data_tran_stop_0;
     wire channel_data_read_0;
@@ -110,7 +110,7 @@ wire [3:0] enable_VIO;
 			.serial_data_in_n_3     (serial_data_in_n_3),
 
 			.tds_mode               (TDS_mode_VIO),
-			.enbale					(enable_VIO),
+			.enable					(enable_VIO),
 
 			.channel_linked         (channel_linked),
 
@@ -229,37 +229,37 @@ wire [3:0] enable_VIO;
 
 
 
-ethernet_mac_interface ethernet_mac_interface_inst(
-	.glbl_rst            (reset_VIO),
-	.eth_clk_in_p        (eth_clk_in_p),
-	.eth_clk_in_n        (eth_clk_in_n),
-	.gtx_clk_bufg_out    (gtx_clk_bufg_out),
-	.phy_resetn          (phy_resetn),
-	.rgmii_txd           (rgmii_txd),
-	.rgmii_tx_ctl        (rgmii_tx_ctl),
-	.rgmii_txc           (rgmii_txc),
-	.rgmii_rxd           (rgmii_rxd),
-	.rgmii_rx_ctl        (rgmii_rx_ctl),
-	.rgmii_rxc           (rgmii_rxc),
-	.rx_axis_fifo_tdata  (rx_axis_fifo_tdata),
-	.rx_axis_fifo_tvalid (rx_axis_fifo_tvalid),
-	.rx_axis_fifo_tready (rx_axis_fifo_tready),
-	.rx_axis_fifo_tlast  (rx_axis_fifo_tlast),
-	.tx_axis_fifo_tdata  (tx_axis_fifo_tdata),
-	.tx_axis_fifo_tvalid (tx_axis_fifo_tvalid),
-	.tx_axis_fifo_tready (tx_axis_fifo_tready),
-	.tx_axis_fifo_tlast  (tx_axis_fifo_tlast));
-
-control_VIO control_VIO_top (
-  .clk(clk160),                // input wire clk
-  .probe_out0(reset_VIO),  // output wire [0 : 0] probe_out0
-  .probe_out1(TDS_mode_VIO), //output wire [0 : 0] probe_out1
-  .probe_out2(enable_VIO),//output wire [3 : 0] probe_out2
-  .probe_out3(D_MAC_add_VIO),//output wire [47 : 0] probe_out3
-  .probe_out4(S_MAC_add_VIO),//output wire [47 : 0] probe_out4
-  .probe_out5(counter_th_VIO),//output wire [11 : 0] probe_out5
-  .probe_out6(idle_counter_number_th_VIO)//output wire [11 : 0] probe_out6
-);
+	ethernet_mac_interface ethernet_mac_interface_inst(
+		.glbl_rst            (reset_VIO),
+		.eth_clk_in_p        (eth_clk_in_p),
+		.eth_clk_in_n        (eth_clk_in_n),
+		.gtx_clk_bufg_out    (gtx_clk_bufg_out),
+		.phy_resetn          (phy_resetn),
+		.rgmii_txd           (rgmii_txd),
+		.rgmii_tx_ctl        (rgmii_tx_ctl),
+		.rgmii_txc           (rgmii_txc),
+		.rgmii_rxd           (rgmii_rxd),
+		.rgmii_rx_ctl        (rgmii_rx_ctl),
+		.rgmii_rxc           (rgmii_rxc),
+		.rx_axis_fifo_tdata  (rx_axis_fifo_tdata),
+		.rx_axis_fifo_tvalid (rx_axis_fifo_tvalid),
+		.rx_axis_fifo_tready (rx_axis_fifo_tready),
+		.rx_axis_fifo_tlast  (rx_axis_fifo_tlast),
+		.tx_axis_fifo_tdata  (tx_axis_fifo_tdata),
+		.tx_axis_fifo_tvalid (tx_axis_fifo_tvalid),
+		.tx_axis_fifo_tready (tx_axis_fifo_tready),
+		.tx_axis_fifo_tlast  (tx_axis_fifo_tlast));
+	
+	control_VIO control_VIO_top (
+	  .clk(clk160),                // input wire clk
+	  .probe_out0(reset_VIO),  // output wire [0 : 0] probe_out0
+	  .probe_out1(TDS_mode_VIO), //output wire [0 : 0] probe_out1
+	  .probe_out2(enable_VIO),//output wire [3 : 0] probe_out2
+	  .probe_out3(D_MAC_add_VIO),//output wire [47 : 0] probe_out3
+	  .probe_out4(S_MAC_add_VIO),//output wire [47 : 0] probe_out4
+	  .probe_out5(counter_th_VIO),//output wire [11 : 0] probe_out5
+	  .probe_out6(idle_counter_number_th_VIO)//output wire [11 : 0] probe_out6
+	);
 
 
 endmodule

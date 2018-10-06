@@ -573,24 +573,24 @@ end
 //   .probe0(des_padata_locked_160M), // input wire [115:0] probe0
 //   .probe1(syn_fifo_empty) // input wire [0:0] probe1
 // );
-// wire [11:0] raw_BCID;
-// wire [103:0] raw_data;
-// assign raw_BCID =des_padata_locked[115:104];
-// assign raw_data=des_padata_locked[103:0];
-// ila_pad_data_240M ila_pad_data_240M_inst (
-//   .clk(USER_CLK), // input wire clk
-//   .probe0(pos), // input wire [6:0] probe0
-//   .probe1(syn_cnt), // input wire [8:0] probe1
-//   .probe2(err_cnt),//input wire [4:0] probe1
-//   .probe3(s_cnt),//[2:0]
-//   .probe4(state),//[3:0]
-//   .probe5(padtds_d2),//[119:0]
-//   .probe6(padtds_d1),//[119:0]
-//   .probe7(padtds_d),//[119:0]
-//   .probe8(des_pdata),//[115:0]
-//   .probe9(raw_BCID),//[11:0]
-//   .probe10(raw_data),//[103:0]
-//   .probe11(des_padata_locked_160M)//115:0  
-// );
+//wire [11:0] raw_BCID;
+//wire [103:0] raw_data;
+//assign raw_BCID =des_padata_locked[115:104];
+//assign raw_data=des_padata_locked[103:0];
+//ila_pad_data_240M ila_pad_data_240M_inst (
+//  .clk(USER_CLK), // input wire clk
+//  .probe0(pos), // input wire [6:0] probe0
+//  .probe1(syn_cnt), // input wire [8:0] probe1
+//  .probe2(err_cnt),//input wire [4:0] probe1
+//  .probe3(s_cnt),//[2:0]
+//  .probe4(state),//[3:0]
+//  .probe5(padtds_d2),//[119:0]
+//  .probe6(padtds_d1),//[119:0]
+//  .probe7(padtds_d),//[119:0]
+//  .probe8(des_pdata),//[115:0]
+//  .probe9(raw_BCID),//[11:0]
+//  .probe10(raw_data),//[103:0]
+//  .probe11(des_padata_locked_160M)//115:0  
+//);
 
 endmodule   

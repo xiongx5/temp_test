@@ -1,7 +1,7 @@
 //==================================================================================================
-//  Filename      : GTP_Wrapper_4.v
-//  Created On    : 2018-10-01 10:07:07
-//  Last Modified : 2018-10-05 19:24:45
+//  Filename      : GTP_Wrapper_4_independent.v
+//  Created On    : 2018-10-05 22:02:22
+//  Last Modified : 2018-10-05 22:02:23
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -15,7 +15,7 @@
 
 `timescale 1ns / 1ps
 
-module GTP_Wrapper_4(    
+module GTP_Wrapper_4_independent(    
     input GTP_CLK_p,
     input GTP_CLK_n,
 
@@ -369,7 +369,7 @@ module GTP_Wrapper_4(
    wire gt0_tx_mmcm_lock_out,gt1_tx_mmcm_lock_out, gt2_tx_mmcm_lock_out, gt3_tx_mmcm_lock_out;
 
         
-    gtx_tds_4p8G  gtx_tds_4p8G_inst
+    gtx_4_independent  gtx_4_independent_inst
     (
      .soft_reset_tx_in(soft_reset_tx_in), // input wire soft_reset_tx_in
      .soft_reset_rx_in(soft_reset_rx_in), // input wire soft_reset_rx_in

@@ -44,14 +44,14 @@ wire [11:0] BCID;
 assign BCID= pad_data_in[115:104];
 assign  data_valid = hit_flag&pad_data_valid;
 assign  data_out= pad_data_in;
-ila_pad_data_check ila_pad_data_check_inst (
- .clk(clk160), // input wire clk
- .probe0(pad_data_in), // input wire 116 probe0
- .probe1(link_message), // input wire 19 probe1
- .probe2(hit_flag),//1
- .probe3(BCID),//12
- .probe4(pad_data_valid)
-);
+// ila_pad_data_check ila_pad_data_check_inst (
+//  .clk(clk160), // input wire clk
+//  .probe0(pad_data_in), // input wire 116 probe0
+//  .probe1(link_message), // input wire 19 probe1
+//  .probe2(hit_flag),//1
+//  .probe3(BCID),//12
+//  .probe4(pad_data_valid)
+// );
 
 
 

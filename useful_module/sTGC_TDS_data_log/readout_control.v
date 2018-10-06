@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-04 21:56:16
+//  Last Modified : 2018-10-06 13:44:41
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -152,9 +152,7 @@ wire  idle_cylce; assign  idle_cylce =  idle_cyle_num == idle_counter_number_th;
 always @(posedge clk ) begin
 	if (reset) begin
 		idle_cyle_num <= 12'b0;		
-	end	else if (idle_cyle_num == idle_counter_number_th) begin
-		idle_cyle_num <= 12'b0;	
-	end else if(cycle_counter == start_point)begin
+	end	else if(cycle_counter == start_point)begin
 		idle_cyle_num <= ((|channel_not_empty_r) | idle_cylce) ? 12'b0 : idle_cyle_num + 12'b1;
 	end 
 end
@@ -207,11 +205,14 @@ always @(posedge clk ) begin
 	end else if(cycle_counter == start_point + 12'h0012)begin
 		eth_fifo_data  <= 12'b0; 
 		eth_fifo_write <= readout_processing;
+	end else begin
+		eth_fifo_data  <= 12'b0; 
+		eth_fifo_write <= 1'b0;
 	end
 end
 
 assign {channel_data_read_7,channel_data_read_6,channel_data_read_5,channel_data_read_4,
-		channel_data_read_3,channel_data_read_2,channel_data_read_1,channel_data_read_0} = channel_not_empty_r;
+		channel_data_read_3,channel_data_read_2,channel_data_read_1,channel_data_read_0} = channel_not_empty_r_one_hot;
 
 
 
@@ -229,7 +230,7 @@ always @(posedge clk) begin
 	if (reset) begin
 		// reset
 		data_tran_stop <= 1'b0;
-	end	else if ((cycle_counter >= start_point + 12'h0008)&(cycle_counter <= start_point + 12'h000f)) begin
+	end	else if ((cycle_counter >= start_point + 12'h0010)&(cycle_counter <= start_point + 12'h0017)) begin
 		data_tran_stop <= 1'b1;
 	end else begin
 		data_tran_stop <= 1'b0;
@@ -250,7 +251,7 @@ always @(posedge clk) begin
 	if (reset) begin
 		// reset
 		channel_fifo_s_reset <= 1'b0;
-	end	else if ((cycle_counter >= start_point + 12'h0009)&(cycle_counter <= start_point + 12'h000b)) begin
+	end	else if ((cycle_counter >= start_point + 12'h0011)&(cycle_counter <= start_point + 12'h0013)) begin
 		channel_fifo_s_reset <= 1'b1;
 	end else begin
 		channel_fifo_s_reset <= 1'b0;
@@ -383,5 +384,39 @@ always @(posedge mac_clk) begin
 		tx_axis_fifo_tlast <= 1'b0;
 	end
 end
+
+
+  readout_control_ila readout_control_ila_inst (
+    .clk(clk), // input wire clk
+
+    .probe0(cycle_counter), // input wire [11:0] probe0
+    .probe1(packet_count), // input wire [7:0] probe1
+    .probe2(counter_th), // input wire [11:0] probe2
+    .probe3(start_point), // input wire [11:0] probe3
+    .probe4(readout_processing), // input wire [0:0] probe4
+    .probe5(channel_not_empty_r), // input wire [7:0] probe5
+    .probe6(channel_not_empty), // input wire [7:0] probe6
+    .probe7(channel_not_empty_r_one_hot), // input wire [7:0] probe7
+    .probe8(idle_cyle_num), // input wire [11:0] probe8
+    .probe9(idle_counter_number_th), // input wire [11:0] probe9
+    .probe10(idle_cylce), // input wire [0:0] prob10
+    .probe11(idle_cylce_r), // input wire [0:0] probe11
+
+    .probe12(eth_fifo_data), // input wire [119:0] probe12
+    .probe13(eth_fifo_write), // input wire [0:0] probe13
+    .probe14(data_tran_stop), // input wire [0:0] probe14  
+    .probe15(channel_fifo_s_reset) // input wire [0:0] probe15
+  );
+  readout_control_mac_ila readout_control_mac_ila_inst (
+    .clk(mac_clk), // input wire clk
+
+    .probe0(byte_set), // input wire [9:0] probe0
+    .probe1(eth_bridge_fifo_reg_data_r), // input wire [119:0] probe1
+    .probe2(eth_bridge_fifo_rd), // input wire [0:0] probe2
+    .probe3(tx_axis_fifo_tvalid), // input wire [0:0] probe3
+    .probe4(tx_axis_fifo_tlast), // input wire [0:0] probe4
+    .probe5(eth_bridge_fifo_reg_data), // input wire [119:0] probe5
+    .probe6(tx_axis_fifo_tready) // input wire [0:0] probe6
+  );
 
 endmodule

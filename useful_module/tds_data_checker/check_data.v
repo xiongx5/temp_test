@@ -53,7 +53,7 @@ wire clk40;
 wire [19:0] GTP_data_out;
 wire gt0_rx_system_reset_c;
 wire data_clk;
- GTP_Wrapper GTP_Wrapper_inst(    
+ GTP_Wrapper_X0Y13 GTP_Wrapper_inst(    
     .GTP_CLK_p(GTP_CLK_p),
     .GTP_CLK_n(GTP_CLK_n),
     .serial_data_in_p(serial_data_in_p),
