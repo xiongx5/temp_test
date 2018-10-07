@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_example_design_clock.v
+// File       : tri_mode_ethernet_mac_0_example_design_clock.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2012 Xilinx, Inc. All rights reserved.
@@ -53,7 +53,7 @@
 
 `timescale 1 ps/1 ps
 
-module ethernet_interface_example_design_clocks
+module tri_mode_ethernet_mac_0_example_design_clocks
    (
    // differential clock inputs
    input          clk_in_p,
@@ -90,7 +90,7 @@ module ethernet_interface_example_design_clocks
   BUFGCE bufg_clkin1 (.I(clkin1), .CE  (1'b1), .O(clkin1_bufg));
 
   // detect a falling edge on dcm_locked (after resyncing to this domain)
-  ethernet_interface_sync_block lock_sync (
+  tri_mode_ethernet_mac_0_sync_block lock_sync (
      .clk              (clkin1_bufg),
      .data_in          (dcm_locked_int),
      .data_out         (dcm_locked_sync)
@@ -106,7 +106,7 @@ module ethernet_interface_example_design_clocks
   // the MMCM reset should be at least 5ns - that is one cycle of the input clock -
   // since the source of the input reset is unknown (a push switch in board design)
   // this needs to be debounced
-   ethernet_interface_reset_sync mmcm_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync mmcm_reset_gen (
       .clk              (clkin1_bufg),
       .enable           (1'b1),
       .reset_in         (glbl_rst | dcm_locked_edge),
@@ -118,7 +118,7 @@ module ethernet_interface_example_design_clocks
   // Generate clocks using the clock wizard
   //----------------------------------------------------------------------------
 
-  ethernet_interface_clk_wiz clock_generator
+  tri_mode_ethernet_mac_0_clk_wiz clock_generator
   (
       // Clock in ports
       .CLK_IN1       (clkin1),

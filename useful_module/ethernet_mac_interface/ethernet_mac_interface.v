@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_example_design.v
+// File       : tri_mode_ethernet_mac_0_example_design.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2004-2013 Xilinx, Inc. All rights reserved.
@@ -67,8 +67,8 @@
 //                   -the User side of the FIFOs are clocked at gtx_clk
 //                    at all times
 //
-//               * Instantiates a state machine which drives the configuration
-//                 vector to bring the TEMAC up in the correct state
+//               * Instantiates a state machine which drives the AXI Lite
+//                 interface to bring the TEMAC up in the correct state
 //
 //               * Serializes the Statistics vectors to prevent logic being
 //                 optimized out
@@ -95,9 +95,9 @@
 //    |           |              | SUPPORT LEVEL       |
 //    | --------  |              |                     |
 //    | |      |  |              |                     |
-//    | | CNFG |->|------------->|                     |
-//    | | VEC  |  |              |                     |
-//    | | SM   |  |              |                     |
+//    | | AXI  |->|------------->|                     |
+//    | | LITE |  |              |                     |
+//    | |  SM  |  |              |                     |
 //    | |      |<-|<-------------|                     |
 //    | |      |  |              |                     |
 //    | --------  |              |                     |
@@ -136,8 +136,8 @@ module ethernet_mac_interface
       input         glbl_rst,
 
       // 200MHz clock input from board
-      input         eth_clk_in_p,
-      input         eth_clk_in_n,
+      input         clk_in_p,
+      input         clk_in_n,
       // 125 MHz clock from MMCM
       output        gtx_clk_bufg_out,
 
@@ -153,11 +153,17 @@ module ethernet_mac_interface
       input         rgmii_rx_ctl,
       input         rgmii_rxc,
 
+      
+      // MDIO Interface
+      //---------------
+      inout         mdio,
+      output        mdc,
 
-//      // Serialised statistics vectors
-//      //------------------------------
-//      output        tx_statistics_s,
-//      output        rx_statistics_s,
+
+      // Serialised statistics vectors
+      //------------------------------
+      //output        tx_statistics_s,
+      //output        rx_statistics_s,
 
       // Serialised Pause interface controls
       //------------------------------------
@@ -173,8 +179,11 @@ module ethernet_mac_interface
       //input         gen_tx_data,
       //input         chk_tx_data,
       //input         reset_error,
-
-
+      //output        frame_error,
+      //output        frame_errorn,
+      //output        activity_flash,
+      //output        activity_flashn
+      
       output [7:0] rx_axis_fifo_tdata,
       output rx_axis_fifo_tvalid,
       input  rx_axis_fifo_tready,
@@ -184,14 +193,26 @@ module ethernet_mac_interface
       input tx_axis_fifo_tvalid,
       output tx_axis_fifo_tready,
       input tx_axis_fifo_tlast
+      
+      
+      
+      
 
     );
-wire update_speed; assign update_speed  = 1'b0;
-wire pause_req_s;  assign  pause_req_s  = 1'b0;
+wire [1:0] mac_speed; assign mac_speed = 2'b11;
+wire update_speed; assign update_speed = 1'b0;
+wire config_board; assign config_board = 1'b0;
+wire chk_tx_data; assign chk_tx_data = 1'b0;
+wire reset_error; assign reset_error = 1'b0;
+wire pause_req_s; assign pause_req_s = 1'b0;
+
+
+wire serial_response;
+wire tx_statistics_s,rx_statistics_s;
    //----------------------------------------------------------------------------
    // internal signals used in this top level wrapper.
    //----------------------------------------------------------------------------
-wire [1:0] mac_speed; assign mac_speed=2'b11;
+
    // example design clocks
    wire                 gtx_clk_bufg;
    
@@ -200,8 +221,8 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
    wire                 rx_mac_aclk;
    wire                 tx_mac_aclk;
    // resets (and reset generation)
-   wire                 vector_resetn;
-   //wire                 chk_resetn;
+   wire                 s_axi_resetn;
+   wire                 chk_resetn;
    
    wire                 gtx_resetn;
    
@@ -216,26 +237,66 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
    wire                 rx_fifo_clock;
    wire                 rx_fifo_resetn;
    
+
+
    // USER side TX AXI-S interface
    wire                 tx_fifo_clock;
-   wire                 tx_fifo_resetn; 
+   wire                 tx_fifo_resetn;
+   
+
+   // RX Statistics serialisation signals
+   wire                 rx_statistics_valid;
+   reg                  rx_statistics_valid_reg;
+   wire  [27:0]         rx_statistics_vector;
+   reg   [27:0]         rx_stats;
+   reg   [29:0]         rx_stats_shift;
+   reg                  rx_stats_toggle = 0;
+   wire                 rx_stats_toggle_sync;
+   reg                  rx_stats_toggle_sync_reg = 0;
+
+   // TX Statistics serialisation signals
+   wire                 tx_statistics_valid;
+   reg                  tx_statistics_valid_reg;
+   wire  [31:0]         tx_statistics_vector;
+   reg   [31:0]         tx_stats;
+   reg   [33:0]         tx_stats_shift;
+   reg                  tx_stats_toggle = 0;
+   wire                 tx_stats_toggle_sync;
+   reg                  tx_stats_toggle_sync_reg = 0;
+   wire                 inband_link_status;
+   wire  [1:0]          inband_clock_speed;
+   wire                 inband_duplex_status;
 
    // Pause interface DESerialisation
    reg   [18:0]         pause_shift;
    reg                  pause_req;
    reg   [15:0]         pause_val;
 
-   wire  [79:0]         rx_configuration_vector;
-   wire  [79:0]         tx_configuration_vector;
+   // AXI-Lite interface
+   wire  [11:0]         s_axi_awaddr;
+   wire                 s_axi_awvalid;
+   wire                 s_axi_awready;
+   wire  [31:0]         s_axi_wdata;
+   wire                 s_axi_wvalid;
+   wire                 s_axi_wready;
+   wire  [1:0]          s_axi_bresp;
+   wire                 s_axi_bvalid;
+   wire                 s_axi_bready;
+   wire  [11:0]         s_axi_araddr;
+   wire                 s_axi_arvalid;
+   wire                 s_axi_arready;
+   wire  [31:0]         s_axi_rdata;
+   wire  [1:0]          s_axi_rresp;
+   wire                 s_axi_rvalid;
+   wire                 s_axi_rready;
 
    // set board defaults - only updated when reprogrammed
    reg                  enable_address_swap = 1;
+            
+   reg                  enable_phy_loopback = 0;
 
-
-
-
-  assign serial_response = 0;
-
+   // signal tie offs
+   wire  [7:0]          tx_ifg_delay = 0;    // not used in this example
 
 
 
@@ -243,20 +304,20 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
   // Clock logic to generate required clocks from the 200MHz on board
   // if 125MHz is available directly this can be removed
   //----------------------------------------------------------------------------
-  ethernet_interface_example_design_clocks example_clocks
+  tri_mode_ethernet_mac_0_example_design_clocks example_clocks
    (
       // differential clock inputs
-      .clk_in_p         (eth_clk_in_p),
-      .clk_in_n         (eth_clk_in_n),
+      .clk_in_p         (clk_in_p),
+      .clk_in_n         (clk_in_n),
 
       // asynchronous control/resets
       .glbl_rst         (glbl_rst),
       .dcm_locked       (dcm_locked),
 
       // clock outputs
-      .gtx_clk_bufg     (gtx_clk_bufg),//125m
-      .refclk_bufg      (refclk_bufg),//200m
-      .s_axi_aclk       (s_axi_aclk)//100m
+      .gtx_clk_bufg     (gtx_clk_bufg),
+      .refclk_bufg      (refclk_bufg),
+      .s_axi_aclk       (s_axi_aclk)
    );
 
     // Pass the GTX clock to the Test Bench
@@ -275,7 +336,7 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
   // Generate resets required for the fifo side signals etc
   //----------------------------------------------------------------------------
 
-   ethernet_interface_example_design_resets example_resets
+   tri_mode_ethernet_mac_0_example_design_resets example_resets
    (
       // clocks
       .s_axi_aclk       (s_axi_aclk),
@@ -283,7 +344,7 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
 
       // asynchronous resets
       .glbl_rst         (glbl_rst),
-      .reset_error      (1'b0),
+      .reset_error      (reset_error),
       .rx_reset         (rx_reset),
       .tx_reset         (tx_reset),
 
@@ -296,9 +357,9 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
    
       .gtx_resetn       (gtx_resetn),
    
-      .vector_resetn    (vector_resetn),
+      .s_axi_resetn     (s_axi_resetn),
       .phy_resetn       (phy_resetn),
-      .chk_resetn       ()
+      .chk_resetn       (chk_resetn)
    );
 
 
@@ -313,6 +374,80 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
   // This is a single bit approach, retimed onto gtx_clk
   // this code is only present to prevent code being stripped..
   //----------------------------------------------------------------------------
+
+  // RX STATS
+
+  // first capture the stats on the appropriate clock
+  always @(posedge rx_mac_aclk)
+  begin
+     rx_statistics_valid_reg <= rx_statistics_valid;
+     if (!rx_statistics_valid_reg & rx_statistics_valid) begin
+        rx_stats <= rx_statistics_vector;
+        rx_stats_toggle <= !rx_stats_toggle;
+     end
+  end
+
+  tri_mode_ethernet_mac_0_sync_block rx_stats_sync (
+     .clk              (gtx_clk_bufg),
+     .data_in          (rx_stats_toggle),
+     .data_out         (rx_stats_toggle_sync)
+  );
+
+  always @(posedge gtx_clk_bufg)
+  begin
+     rx_stats_toggle_sync_reg <= rx_stats_toggle_sync;
+  end
+
+  // when an update is rxd load shifter (plus start/stop bit)
+  // shifter always runs (no power concerns as this is an example design)
+  always @(posedge gtx_clk_bufg)
+  begin
+     if (rx_stats_toggle_sync_reg != rx_stats_toggle_sync) begin
+        rx_stats_shift <= {1'b1, rx_stats, 1'b1};
+     end
+     else begin
+        rx_stats_shift <= {rx_stats_shift[28:0], 1'b0};
+     end
+  end
+
+  assign rx_statistics_s = rx_stats_shift[29];
+
+  // TX STATS
+
+  // first capture the stats on the appropriate clock
+  always @(posedge tx_mac_aclk)
+  begin
+     tx_statistics_valid_reg <= tx_statistics_valid;
+     if (!tx_statistics_valid_reg & tx_statistics_valid) begin
+        tx_stats <= tx_statistics_vector;
+        tx_stats_toggle <= !tx_stats_toggle;
+     end
+  end
+
+  tri_mode_ethernet_mac_0_sync_block tx_stats_sync (
+     .clk              (gtx_clk_bufg),
+     .data_in          (tx_stats_toggle),
+     .data_out         (tx_stats_toggle_sync)
+  );
+
+  always @(posedge gtx_clk_bufg)
+  begin
+     tx_stats_toggle_sync_reg <= tx_stats_toggle_sync;
+  end
+
+  // when an update is txd load shifter (plus start bit)
+  // shifter always runs (no power concerns as this is an example design)
+  always @(posedge gtx_clk_bufg)
+  begin
+     if (tx_stats_toggle_sync_reg != tx_stats_toggle_sync) begin
+        tx_stats_shift <= {1'b1, tx_stats, 1'b1};
+     end
+     else begin
+        tx_stats_shift <= {tx_stats_shift[32:0], 1'b0};
+     end
+  end
+
+  assign tx_statistics_s = tx_stats_shift[33];
 
   //----------------------------------------------------------------------------
   // DSerialize the Pause interface
@@ -339,26 +474,46 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
   end
 
   //----------------------------------------------------------------------------
-  // Instantiate the Config vector controller Controller
+  // Instantiate the AXI-LITE Controller
   //----------------------------------------------------------------------------
-   ethernet_interface_config_vector_sm config_vector_controller (
-   
-      .gtx_clk                      (gtx_clk_bufg),
-   
-      .gtx_resetn                   (vector_resetn),
+
+   tri_mode_ethernet_mac_0_axi_lite_sm axi_lite_controller (
+      .s_axi_aclk                   (s_axi_aclk),
+      .s_axi_resetn                 (s_axi_resetn),
 
       .mac_speed                    (mac_speed),
       .update_speed                 (update_speed),   // may need glitch protection on this..
+      .serial_command               (pause_req_s),
+      .serial_response              (serial_response),
+            
+      .phy_loopback                 (enable_phy_loopback),
 
-      .rx_configuration_vector      (rx_configuration_vector),
-      .tx_configuration_vector      (tx_configuration_vector)
+      .s_axi_awaddr                 (s_axi_awaddr),
+      .s_axi_awvalid                (s_axi_awvalid),
+      .s_axi_awready                (s_axi_awready),
+
+      .s_axi_wdata                  (s_axi_wdata),
+      .s_axi_wvalid                 (s_axi_wvalid),
+      .s_axi_wready                 (s_axi_wready),
+
+      .s_axi_bresp                  (s_axi_bresp),
+      .s_axi_bvalid                 (s_axi_bvalid),
+      .s_axi_bready                 (s_axi_bready),
+
+      .s_axi_araddr                 (s_axi_araddr),
+      .s_axi_arvalid                (s_axi_arvalid),
+      .s_axi_arready                (s_axi_arready),
+
+      .s_axi_rdata                  (s_axi_rdata),
+      .s_axi_rresp                  (s_axi_rresp),
+      .s_axi_rvalid                 (s_axi_rvalid),
+      .s_axi_rready                 (s_axi_rready)
    );
-
 
   //----------------------------------------------------------------------------
   // Instantiate the TRIMAC core fifo block wrapper
   //----------------------------------------------------------------------------
-  ethernet_interface_fifo_block trimac_fifo_block (
+  tri_mode_ethernet_mac_0_fifo_block trimac_fifo_block (
       .gtx_clk                      (gtx_clk_bufg),
       
        
@@ -374,8 +529,8 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
       //---------------------------------------
       .rx_mac_aclk                  (rx_mac_aclk),
       .rx_reset                     (rx_reset),
-      .rx_statistics_vector         (),
-      .rx_statistics_valid          (),
+      .rx_statistics_vector         (rx_statistics_vector),
+      .rx_statistics_valid          (rx_statistics_valid),
 
       // Receiver (AXI-S) Interface
       //----------------------------------------
@@ -390,9 +545,9 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
       //------------------------------------------
       .tx_mac_aclk                  (tx_mac_aclk),
       .tx_reset                     (tx_reset),
-      .tx_ifg_delay                 ('b0),
-      .tx_statistics_vector         (),
-      .tx_statistics_valid          (),
+      .tx_ifg_delay                 (tx_ifg_delay),
+      .tx_statistics_vector         (tx_statistics_vector),
+      .tx_statistics_valid          (tx_statistics_valid),
 
       // Transmitter (AXI-S) Interface
       //-------------------------------------------
@@ -421,14 +576,44 @@ wire [1:0] mac_speed; assign mac_speed=2'b11;
 
       // RGMII Inband Status Registers
       //--------------------------------
-      .inband_link_status           (),
-      .inband_clock_speed           (),
-      .inband_duplex_status         (),
+      .inband_link_status           (inband_link_status),
+      .inband_clock_speed           (inband_clock_speed),
+      .inband_duplex_status         (inband_duplex_status),
 
-      // Configuration Vectors
-      //-----------------------
-      .rx_configuration_vector      (rx_configuration_vector),
-      .tx_configuration_vector      (tx_configuration_vector)
+      
+      // MDIO Interface
+      //---------------
+      .mdio                         (mdio),
+      .mdc                          (mdc),
+
+      // AXI-Lite Interface
+      //---------------
+      .s_axi_aclk                   (s_axi_aclk),
+      .s_axi_resetn                 (s_axi_resetn),
+
+      .s_axi_awaddr                 (s_axi_awaddr),
+      .s_axi_awvalid                (s_axi_awvalid),
+      .s_axi_awready                (s_axi_awready),
+
+      .s_axi_wdata                  (s_axi_wdata),
+      .s_axi_wvalid                 (s_axi_wvalid),
+      .s_axi_wready                 (s_axi_wready),
+
+      .s_axi_bresp                  (s_axi_bresp),
+      .s_axi_bvalid                 (s_axi_bvalid),
+      .s_axi_bready                 (s_axi_bready),
+
+      .s_axi_araddr                 (s_axi_araddr),
+      .s_axi_arvalid                (s_axi_arvalid),
+      .s_axi_arready                (s_axi_arready),
+
+      .s_axi_rdata                  (s_axi_rdata),
+      .s_axi_rresp                  (s_axi_rresp),
+      .s_axi_rvalid                 (s_axi_rvalid),
+      .s_axi_rready                 (s_axi_rready)
+
    );
+
+
 endmodule
 

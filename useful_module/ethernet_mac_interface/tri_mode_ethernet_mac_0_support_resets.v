@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// File       : ethernet_interface_support_resets.v
+// File       : tri_mode_ethernet_mac_0_support_resets.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2013 Xilinx, Inc. All rights reserved.
@@ -54,7 +54,7 @@
 
 `timescale 1ns / 1ps
 
-module ethernet_interface_support_resets
+module tri_mode_ethernet_mac_0_support_resets
 (
     input           glbl_rstn,
     input           refclk,
@@ -89,7 +89,7 @@ module ethernet_interface_support_resets
  assign idelayctrl_reset_in   = glbl_rst || !idelayctrl_ready;
 
    // Create a synchronous reset in the IDELAYCTRL refclk clock domain.
-   ethernet_interface_reset_sync idelayctrl_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync idelayctrl_reset_gen (
       .clk              (refclk),
       .enable           (1'b1),
       .reset_in         (idelayctrl_reset_in),
@@ -140,7 +140,7 @@ module ethernet_interface_support_resets
   assign gtx_mmcm_rst_in = glbl_rst | gtx_dcm_locked_edge;
 
   // Synchronise the async dcm_locked into the gtx_clk clock domain
-   ethernet_interface_sync_block lock_sync (
+   tri_mode_ethernet_mac_0_sync_block lock_sync (
      .clk                   (gtx_clk),
      .data_in               (gtx_dcm_locked),
      .data_out              (gtx_dcm_locked_sync)
@@ -156,7 +156,7 @@ module ethernet_interface_support_resets
   // the MMCM reset should be at least 5ns - that is one cycle of the input clock -
   // since the source of the input reset is unknown (a push switch in board design)
   // this needs to be debounced
-   ethernet_interface_reset_sync gtx_mmcm_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync gtx_mmcm_reset_gen (
       .clk                  (gtx_clk),
       .enable               (1'b1),
       .reset_in             (gtx_mmcm_rst_in),

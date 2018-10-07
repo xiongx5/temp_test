@@ -1,4 +1,4 @@
-// file: ethernet_interface_clk_wiz.v
+// file: tri_mode_ethernet_mac_0_clk_wiz.v
 //
 // -----------------------------------------------------------------------------
 // (c) Copyright 2008-2013 Xilinx, Inc. All rights reserved.
@@ -69,7 +69,7 @@
 
 `timescale 1ps/1ps
 
-module ethernet_interface_clk_wiz
+module tri_mode_ethernet_mac_0_clk_wiz
  (// Clock in ports
   input         CLK_IN1,
   // Clock out ports

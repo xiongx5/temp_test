@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_fifo_block.v
+// File       : tri_mode_ethernet_mac_0_fifo_block.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2004-2013 Xilinx, Inc. All rights reserved.
@@ -86,7 +86,7 @@
 //------------------------------------------------------------------------------
 
 (* DowngradeIPIdentifiedWarnings = "yes" *)
-module ethernet_interface_fifo_block (
+module tri_mode_ethernet_mac_0_fifo_block (
       input         gtx_clk,
       
       // asynchronous reset
@@ -154,10 +154,38 @@ module ethernet_interface_fifo_block (
       output [1:0]  inband_clock_speed,
       output        inband_duplex_status,
 
-      // Configuration Vectors
-      //-----------------------
-      input  [79:0] rx_configuration_vector,
-      input  [79:0] tx_configuration_vector
+      
+      // MDIO Interface
+      //---------------
+      inout         mdio,
+      output        mdc,
+
+      // AXI-Lite Interface
+      //---------------
+      input         s_axi_aclk,
+      input         s_axi_resetn,
+
+      input  [11:0] s_axi_awaddr,
+      input         s_axi_awvalid,
+      output        s_axi_awready,
+
+      input  [31:0] s_axi_wdata,
+      input         s_axi_wvalid,
+      output        s_axi_wready,
+
+      output [1:0]  s_axi_bresp,
+      output        s_axi_bvalid,
+      input         s_axi_bready,
+
+      input  [11:0] s_axi_araddr,
+      input         s_axi_arvalid,
+      output        s_axi_arready,
+
+      output [31:0] s_axi_rdata,
+      output [1:0]  s_axi_rresp,
+      output        s_axi_rvalid,
+      input         s_axi_rready
+
    );
 
 
@@ -195,7 +223,7 @@ module ethernet_interface_fifo_block (
   //----------------------------------------------------------------------------
   // Instantiate the Tri-Mode Ethernet MAC Support Level wrapper
   //----------------------------------------------------------------------------
-  ethernet_interface_support trimac_sup_block (
+  tri_mode_ethernet_mac_0_support trimac_sup_block (
       .gtx_clk              (gtx_clk),
       
 
@@ -256,9 +284,32 @@ module ethernet_interface_fifo_block (
       .inband_clock_speed   (inband_clock_speed),
       .inband_duplex_status (inband_duplex_status),
 
-      // Configuration Vector
-      .rx_configuration_vector (rx_configuration_vector),
-      .tx_configuration_vector (tx_configuration_vector)
+      
+      // MDIO Interface
+      //---------------
+      .mdio                 (mdio),
+      .mdc                  (mdc),
+
+      // AXI lite interface
+      .s_axi_aclk           (s_axi_aclk),
+      .s_axi_resetn         (s_axi_resetn),
+      .s_axi_awaddr         (s_axi_awaddr),
+      .s_axi_awvalid        (s_axi_awvalid),
+      .s_axi_awready        (s_axi_awready),
+      .s_axi_wdata          (s_axi_wdata),
+      .s_axi_wvalid         (s_axi_wvalid),
+      .s_axi_wready         (s_axi_wready),
+      .s_axi_bresp          (s_axi_bresp),
+      .s_axi_bvalid         (s_axi_bvalid),
+      .s_axi_bready         (s_axi_bready),
+      .s_axi_araddr         (s_axi_araddr),
+      .s_axi_arvalid        (s_axi_arvalid),
+      .s_axi_arready        (s_axi_arready),
+      .s_axi_rdata          (s_axi_rdata),
+      .s_axi_rresp          (s_axi_rresp),
+      .s_axi_rvalid         (s_axi_rvalid),
+      .s_axi_rready         (s_axi_rready),
+      .mac_irq              ()
    );
 
 
@@ -268,14 +319,14 @@ module ethernet_interface_fifo_block (
 
    // locally reset sync the mac generated resets - the resets are already fully sync
    // so adding a reset sync shouldn't change that
-   ethernet_interface_reset_sync rx_mac_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync rx_mac_reset_gen (
       .clk                  (rx_mac_aclk_int),
       .enable               (1'b1),
       .reset_in             (rx_reset_int),
       .reset_out            (rx_mac_reset)
    );
 
-   ethernet_interface_reset_sync tx_mac_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync tx_mac_reset_gen (
       .clk                  (tx_mac_aclk_int),
       .enable               (1'b1),
       .reset_in             (tx_reset_int),
@@ -288,7 +339,7 @@ module ethernet_interface_fifo_block (
 
 
    
-   ethernet_interface_ten_100_1g_eth_fifo #
+   tri_mode_ethernet_mac_0_ten_100_1g_eth_fifo #
    (
       .FULL_DUPLEX_ONLY     (1)
    )

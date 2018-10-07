@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 // Title      : Verilog Support Level Module
-// File       : ethernet_interface_support.v
+// File       : tri_mode_ethernet_mac_0_support.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2013 Xilinx, Inc. All rights reserved.
@@ -63,7 +63,7 @@
 //------------------------------------------------------------------------------
 // The entity declaration for the block support level
 //------------------------------------------------------------------------------
-module ethernet_interface_support
+module tri_mode_ethernet_mac_0_support
    (
       input                gtx_clk,
       
@@ -128,10 +128,40 @@ module ethernet_interface_support
       output      [1:0]    inband_clock_speed,
       output               inband_duplex_status,
 
-      // Configuration Vectors
-      //---------------------
-      input       [79:0]   rx_configuration_vector,
-      input       [79:0]   tx_configuration_vector
+      
+      // MDIO Interface
+      //---------------
+      inout                mdio,
+      output               mdc,
+
+      // AXI-Lite Interface
+      //---------------
+      input                s_axi_aclk,
+      input                s_axi_resetn,
+
+      input       [11:0] s_axi_awaddr,
+      input                s_axi_awvalid,
+      output               s_axi_awready,
+
+      input       [31:0]   s_axi_wdata,
+      input                s_axi_wvalid,
+      output               s_axi_wready,
+
+      output      [1:0]    s_axi_bresp,
+      output               s_axi_bvalid,
+      input                s_axi_bready,
+
+      input       [11:0] s_axi_araddr,
+      input                s_axi_arvalid,
+      output               s_axi_arready,
+
+      output      [31:0]   s_axi_rdata,
+      output      [1:0]    s_axi_rresp,
+      output               s_axi_rvalid,
+      input                s_axi_rready,
+
+      output               mac_irq
+
       );
 
   //----------------------------------------------------------------------------
@@ -144,7 +174,7 @@ module ethernet_interface_support
       assign gtx_clk90_out = mmcm_out_gtx_clk90;
 	  
   // Instantiate the sharable clocking logic
-  ethernet_interface_support_clocking tri_mode_ethernet_mac_support_clocking_i
+  tri_mode_ethernet_mac_0_support_clocking tri_mode_ethernet_mac_support_clocking_i
   (
       .clk_in1               (gtx_clk),
       .clk_out1              (mmcm_out_gtx_clk),
@@ -154,7 +184,7 @@ module ethernet_interface_support
  );
 
   // Instantiate the sharable reset logic
-  ethernet_interface_support_resets  tri_mode_ethernet_mac_support_resets_i (
+  tri_mode_ethernet_mac_0_support_resets  tri_mode_ethernet_mac_support_resets_i (
       .glbl_rstn             (glbl_rstn),
       .refclk                (refclk),
       
@@ -181,7 +211,7 @@ module ethernet_interface_support
    //---------------------------------------------------------------------------
    // Instantiate the TEMAC core
    //---------------------------------------------------------------------------
-   ethernet_interface tri_mode_ethernet_mac_i (
+   tri_mode_ethernet_mac_0 tri_mode_ethernet_mac_i (
       .gtx_clk                     (mmcm_out_gtx_clk),
       .gtx_clk90                   (mmcm_out_gtx_clk90),
        // asynchronous reset
@@ -237,10 +267,40 @@ module ethernet_interface_support
       .inband_clock_speed          (inband_clock_speed),
       .inband_duplex_status        (inband_duplex_status),
 
-      // Configuration Vectors
-      //---------------------
-      .rx_configuration_vector     (rx_configuration_vector),
-      .tx_configuration_vector     (tx_configuration_vector)
+       
+      // MDIO Interface
+      //---------------
+      .mdio                        (mdio),
+      .mdc                         (mdc),
+
+      // AXI-Lite Interface
+      //---------------
+      .s_axi_aclk                  (s_axi_aclk),
+      .s_axi_resetn                (s_axi_resetn),
+
+      .s_axi_awaddr                (s_axi_awaddr),
+      .s_axi_awvalid               (s_axi_awvalid),
+      .s_axi_awready               (s_axi_awready),
+
+      .s_axi_wdata                 (s_axi_wdata),
+      .s_axi_wvalid                (s_axi_wvalid),
+      .s_axi_wready                (s_axi_wready),
+
+      .s_axi_bresp                 (s_axi_bresp),
+      .s_axi_bvalid                (s_axi_bvalid),
+      .s_axi_bready                (s_axi_bready),
+
+      .s_axi_araddr                (s_axi_araddr),
+      .s_axi_arvalid               (s_axi_arvalid),
+      .s_axi_arready               (s_axi_arready),
+
+      .s_axi_rdata                 (s_axi_rdata),
+      .s_axi_rresp                 (s_axi_rresp),
+      .s_axi_rvalid                (s_axi_rvalid),
+      .s_axi_rready                (s_axi_rready),
+
+      .mac_irq                     (mac_irq)
+
     );
 
 

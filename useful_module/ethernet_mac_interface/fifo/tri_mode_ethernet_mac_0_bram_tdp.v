@@ -3,7 +3,7 @@
 // Version    : 1.0
 // Project    : Tri-Mode Ethernet MAC
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_bram_tdp.v
+// File       : tri_mode_ethernet_mac_0_bram_tdp.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2013 Xilinx, Inc. All rights reserved.
@@ -63,7 +63,7 @@
 //------------------------------------------------------------------------------
 
 
-module ethernet_interface_bram_tdp #(
+module tri_mode_ethernet_mac_0_bram_tdp #(
     parameter DATA_WIDTH = 8,
     parameter ADDR_WIDTH = 12
 ) (

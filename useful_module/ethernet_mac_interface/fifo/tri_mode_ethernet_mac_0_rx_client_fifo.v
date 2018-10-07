@@ -3,7 +3,7 @@
 // Version    : 1.3
 // Project    : Tri-Mode Ethernet MAC
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_rx_client_fifo.v
+// File       : tri_mode_ethernet_mac_0_rx_client_fifo.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2004-2013 Xilinx, Inc. All rights reserved.
@@ -108,7 +108,7 @@
 //------------------------------------------------------------------------------
 
 (* DowngradeIPIdentifiedWarnings = "yes" *)
-module ethernet_interface_rx_client_fifo
+module tri_mode_ethernet_mac_0_rx_client_fifo
   (
     // User-side (read-side) AxiStream interface
     input            rx_fifo_aclk,
@@ -440,7 +440,7 @@ module ethernet_interface_rx_client_fifo
 
   // When a frame has been stored we need to synchronize that event to the
   // read clock domain for frame count store.
-  ethernet_interface_sync_block resync_wr_store_frame_tog
+  tri_mode_ethernet_mac_0_sync_block resync_wr_store_frame_tog
   (
     .clk       (rx_fifo_aclk),
     .data_in   (wr_store_frame_tog),
@@ -750,7 +750,7 @@ module ethernet_interface_rx_client_fifo
   end
 
 
-  ethernet_interface_sync_block sync_rd_addr_tog
+  tri_mode_ethernet_mac_0_sync_block sync_rd_addr_tog
   (
     .clk      (rx_mac_aclk),
     .data_in  (update_addr_tog),
@@ -847,7 +847,7 @@ module ethernet_interface_rx_client_fifo
   assign rd_eof_bram[0] = rd_eof_data_bram[8];
   assign rd_data_bram   = rd_eof_data_bram[7:0];
 
-ethernet_interface_bram_tdp #
+tri_mode_ethernet_mac_0_bram_tdp #
 (
      .DATA_WIDTH  (9),
      .ADDR_WIDTH  (12)

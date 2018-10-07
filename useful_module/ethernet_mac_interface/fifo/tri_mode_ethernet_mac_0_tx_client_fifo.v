@@ -3,7 +3,7 @@
 // Version    : 1.3
 // Project    : Tri-Mode Ethernet MAC
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_tx_client_fifo.v
+// File       : tri_mode_ethernet_mac_0_tx_client_fifo.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2004-2013 Xilinx, Inc. All rights reserved.
@@ -97,7 +97,7 @@
 //------------------------------------------------------------------------------
 
 (* DowngradeIPIdentifiedWarnings = "yes" *)
-module ethernet_interface_tx_client_fifo #
+module tri_mode_ethernet_mac_0_tx_client_fifo #
   (
     parameter FULL_DUPLEX_ONLY = 0
   )
@@ -1006,7 +1006,7 @@ endgenerate
   end
 
   // Synchronize the read transmit frame signal into the write clock domain.
-  ethernet_interface_sync_block resync_rd_tran_frame_tog
+  tri_mode_ethernet_mac_0_sync_block resync_rd_tran_frame_tog
   (
     .clk       (tx_fifo_aclk),
     .data_in   (rd_tran_frame_tog),
@@ -1092,7 +1092,7 @@ generate if (FULL_DUPLEX_ONLY != 1) begin : gen_hd_count
   end
 
   // Synchronize the read retransmit frame signal into the write clock domain.
-  ethernet_interface_sync_block resync_rd_tran_frame_tog
+  tri_mode_ethernet_mac_0_sync_block resync_rd_tran_frame_tog
   (
     .clk       (tx_fifo_aclk),
     .data_in   (rd_retran_frame_tog),
@@ -1182,7 +1182,7 @@ endgenerate
   end
 
   // Synchronize it back onto read domain for use in the read logic.
-  ethernet_interface_sync_block resync_wr_frame_in_fifo
+  tri_mode_ethernet_mac_0_sync_block resync_wr_frame_in_fifo
   (
     .clk       (tx_mac_aclk),
     .data_in   (wr_frame_in_fifo),
@@ -1190,7 +1190,7 @@ endgenerate
   );
 
   // Synchronize it back onto read domain for use in the read logic.
-  ethernet_interface_sync_block resync_wr_frames_in_fifo
+  tri_mode_ethernet_mac_0_sync_block resync_wr_frames_in_fifo
   (
     .clk       (tx_mac_aclk),
     .data_in   (wr_frames_in_fifo),
@@ -1199,7 +1199,7 @@ endgenerate
 
   // in he case where only one frame is in the fifo we have to be careful about the faling edge of
   // the frame in fifo signal as for short frames this could occur after the state machine completes
-  ethernet_interface_sync_block resync_fif_valid_tog
+  tri_mode_ethernet_mac_0_sync_block resync_fif_valid_tog
   (
     .clk       (tx_mac_aclk),
     .data_in   (frame_in_fifo_valid_tog),
@@ -1550,7 +1550,7 @@ endgenerate
   end
 
   // Synchronize the toggle to the write side.
-  ethernet_interface_sync_block resync_rd_txfer_tog
+  tri_mode_ethernet_mac_0_sync_block resync_rd_txfer_tog
   (
     .clk       (tx_fifo_aclk),
     .data_in   (rd_txfer_tog),
@@ -1707,7 +1707,7 @@ endgenerate
   assign rd_eof_bram[0] = rd_eof_data_bram[8];
   assign rd_data_bram   = rd_eof_data_bram[7:0];
 
-ethernet_interface_bram_tdp #
+tri_mode_ethernet_mac_0_bram_tdp #
   (
      .DATA_WIDTH  (9),
      .ADDR_WIDTH  (12)

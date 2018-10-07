@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-06 13:44:41
+//  Last Modified : 2018-10-07 12:40:30
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -203,10 +203,10 @@ always @(posedge clk ) begin
 							channel_data_counter_3,channel_data_counter_2,channel_data_counter_1,channel_data_counter_0,40'hffffffffff};
 		eth_fifo_write <= readout_processing;
 	end else if(cycle_counter == start_point + 12'h0012)begin
-		eth_fifo_data  <= 12'b0; 
+		eth_fifo_data  <= 120'b0; 
 		eth_fifo_write <= readout_processing;
 	end else begin
-		eth_fifo_data  <= 12'b0; 
+		eth_fifo_data  <= 120'b0; 
 		eth_fifo_write <= 1'b0;
 	end
 end
@@ -297,11 +297,13 @@ always @(posedge mac_clk) begin
 				  (byte_set == 12'd142)|
 				  (byte_set == 12'd158)|
 				  (byte_set == 12'd174)|
+				  (byte_set == 12'd190)|
 				  (byte_set == 12'd206)|
 				  (byte_set == 12'd222)|
 				  (byte_set == 12'd238)|
 				  (byte_set == 12'd254)|
-				  (byte_set == 12'd266))
+				  (byte_set == 12'd270)|
+				  (byte_set == 12'd281))
 				 ) begin
 		if(|eth_bridge_fifo_reg_data)begin
 			byte_set <=byte_set + 12'b1;
@@ -310,29 +312,30 @@ always @(posedge mac_clk) begin
 			tx_axis_fifo_tvalid <= 1'b1;
 			tx_axis_fifo_tlast <= 1'b0;
 		end else begin
-			byte_set <=12'b0;
+			byte_set <=byte_set + 12'b1;
 			eth_bridge_fifo_rd <= 1'b1;
-			tx_axis_fifo_tvalid <= 1'b0;
-			tx_axis_fifo_tlast <= (byte_set != 12'd266);
+			tx_axis_fifo_tvalid <= (byte_set != 12'd281);
+			tx_axis_fifo_tlast <= (byte_set != 12'd281);
 		end
 	end else if(
-		((byte_set >= 12'd1)  &(byte_set <= 12'd13 ))|
-		((byte_set >= 12'd15) &(byte_set <= 12'd29 ))|
-		((byte_set >= 12'd31) &(byte_set <= 12'd45 ))|
-		((byte_set >= 12'd47) &(byte_set <= 12'd61 ))|
-		((byte_set >= 12'd63) &(byte_set <= 12'd77 ))|
-		((byte_set >= 12'd79) &(byte_set <= 12'd93 ))|
-		((byte_set >= 12'd95) &(byte_set <= 12'd109))|
-		((byte_set >= 12'd111)&(byte_set <= 12'd125))|
-		((byte_set >= 12'd127)&(byte_set <= 12'd141))|
-		((byte_set >= 12'd143)&(byte_set <= 12'd157))|
-		((byte_set >= 12'd159)&(byte_set <= 12'd173))|
-		((byte_set >= 12'd175)&(byte_set <= 12'd189))|
-		((byte_set >= 12'd207)&(byte_set <= 12'd205))|
-		((byte_set >= 12'd223)&(byte_set <= 12'd221))|
-		((byte_set >= 12'd239)&(byte_set <= 12'd237))|
-		((byte_set >= 12'd255)&(byte_set <= 12'd253))|
-		((byte_set >= 12'd255)&(byte_set <= 12'd262))
+		((byte_set >= 12'd1)  &(byte_set <= 12'd13 ))|//13
+		((byte_set >= 12'd15) &(byte_set <= 12'd29 ))|//15 1
+		((byte_set >= 12'd31) &(byte_set <= 12'd45 ))|//15 2
+		((byte_set >= 12'd47) &(byte_set <= 12'd61 ))|//15 3
+		((byte_set >= 12'd63) &(byte_set <= 12'd77 ))|//15 4
+		((byte_set >= 12'd79) &(byte_set <= 12'd93 ))|//15 5
+		((byte_set >= 12'd95) &(byte_set <= 12'd109))|//15 6
+		((byte_set >= 12'd111)&(byte_set <= 12'd125))|//15 7
+		((byte_set >= 12'd127)&(byte_set <= 12'd141))|//15 8
+		((byte_set >= 12'd143)&(byte_set <= 12'd157))|//15 9
+		((byte_set >= 12'd159)&(byte_set <= 12'd173))|//15 10
+		((byte_set >= 12'd175)&(byte_set <= 12'd189))|//15 11
+		((byte_set >= 12'd191)&(byte_set <= 12'd205))|//15 12
+		((byte_set >= 12'd207)&(byte_set <= 12'd221))|//15 13
+		((byte_set >= 12'd223)&(byte_set <= 12'd237))|//15 14
+		((byte_set >= 12'd239)&(byte_set <= 12'd253))|//15 15
+		((byte_set >= 12'd255)&(byte_set <= 12'd269))|//15 16
+		((byte_set >= 12'd271)&(byte_set <= 12'd278))
 		)begin
 		eth_bridge_fifo_rd <= 1'b0;
 		tx_axis_fifo_tvalid <= 1'b1;
@@ -355,9 +358,10 @@ always @(posedge mac_clk) begin
 								   (byte_set == 12'd205)|
 								   (byte_set == 12'd221)|
 								   (byte_set == 12'd237)|
-								   (byte_set == 12'd253));
+								   (byte_set == 12'd253)|
+								   (byte_set == 12'd269));
 		end 
-	end else if(byte_set == 12'd263)begin
+	end else if(byte_set == 12'd279)begin
 		eth_bridge_fifo_rd <= 1'b0;
 		tx_axis_fifo_tvalid <= 1'b1;
 		tx_axis_fifo_tlast <= 1'b0;
@@ -366,7 +370,7 @@ always @(posedge mac_clk) begin
 			eth_bridge_fifo_reg_data_r <= eth_bridge_fifo_reg_data_r << 8;
 			tx_axis_fifo_tlast <= 1'b1;
 		end 
-	end else if(byte_set == 12'd264) begin
+	end else if(byte_set == 12'd280) begin
 		eth_bridge_fifo_rd <= 1'b0;
 		tx_axis_fifo_tvalid <= 1'b1;
 		tx_axis_fifo_tlast <= 1'b1;
@@ -416,7 +420,9 @@ end
     .probe3(tx_axis_fifo_tvalid), // input wire [0:0] probe3
     .probe4(tx_axis_fifo_tlast), // input wire [0:0] probe4
     .probe5(eth_bridge_fifo_reg_data), // input wire [119:0] probe5
-    .probe6(tx_axis_fifo_tready) // input wire [0:0] probe6
+    .probe6(tx_axis_fifo_tready), // input wire [0:0] probe6
+    .probe7(tx_axis_fifo_tdata),// input wire [7:0] probe7
+    .probe8(eth_bridge_fifo_reg_data_empty)// input wire [0:0] probe8
   );
 
 endmodule

@@ -1,19 +1,16 @@
 //------------------------------------------------------------------------------
-// Title      : Synchronous Reset generation flip-flop pair
-// Project    : Tri-Mode ethernet MAC
+// Title      : CDC Sync Block
+// Project    : Tri-Mode Ethernet MAC
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_reset_sync.v
-// Author     : Xilinx, Inc.
+// File       : tri_mode_ethernet_mac_0_sync_block.v
+// Author     : Xilinx Inc.
 //------------------------------------------------------------------------------
-// Description: All flip-flops have the same asynchronous reset signal.
-//              Together the flops create a minimum of a 1 clock period
-//              duration pulse which is used for synchronous reset.
-//
-//              The flops are placed, using the ASYNC_REG atrtribute, into the
-//              same slice.
-//
+// Description: Used on signals crossing from one clock domain to another, this
+//              is a multiple flip-flop pipeline, with all flops placed together
+//              into the same slice.  Thus the routing delay between the two is
+//              minimum to safe-guard against metastability issues.
 // -----------------------------------------------------------------------------
-// (c) Copyright 2006-2008 Xilinx, Inc. All rights reserved.
+// (c) Copyright 2001-2013 Xilinx, Inc. All rights reserved.
 //
 // This file contains confidential and proprietary information
 // of Xilinx, Inc. and is protected under U.S. and
@@ -60,84 +57,85 @@
 // PART OF THIS FILE AT ALL TIMES. 
 // -----------------------------------------------------------------------------
 
-`timescale 1ps/1ps
+`timescale 1ps / 1ps
 
 (* dont_touch = "yes" *)
-module ethernet_interface_reset_sync #(
-  parameter INITIALISE = 1'b1,
+module tri_mode_ethernet_mac_0_sync_block #(
+  parameter INITIALISE = 1'b0,
   parameter DEPTH = 5
 )
 (
-   input       reset_in,
-   input       clk,
-   input       enable,
-   output      reset_out
+  input        clk,              // clock to be sync'ed to
+  input        data_in,          // Data to be 'synced'
+  output       data_out          // synced data
 );
 
+  // Internal Signals
+  wire   data_sync0;
+  wire   data_sync1;
+  wire   data_sync2;
+  wire   data_sync3;
+  wire   data_sync4;
 
-  wire     reset_sync_reg0;
-  wire     reset_sync_reg1;
-  wire     reset_sync_reg2;
-  wire     reset_sync_reg3;
-  wire     reset_sync_reg4;
 
   (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *)
-  FDPE #(
-   .INIT (INITIALISE[0])
-  ) reset_sync0 (
-  .C  (clk),
-  .CE (enable),
-  .PRE(reset_in),
-  .D  (1'b0),
-  .Q  (reset_sync_reg0)
+  FDRE #(
+    .INIT (INITIALISE[0])
+  ) data_sync_reg0 (
+    .C  (clk),
+    .D  (data_in),
+    .Q  (data_sync0),
+	.CE (1'b1),
+    .R  (1'b0)
   );
 
   (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *)
-  FDPE #(
+  FDRE #(
    .INIT (INITIALISE[0])
-  ) reset_sync1 (
+  ) data_sync_reg1 (
   .C  (clk),
-  .CE (enable),
-  .PRE(reset_in),
-  .D  (reset_sync_reg0),
-  .Q  (reset_sync_reg1)
+  .D  (data_sync0),
+  .Q  (data_sync1),
+  .CE (1'b1),
+  .R  (1'b0)
   );
 
   (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *)
-  FDPE #(
+  FDRE #(
    .INIT (INITIALISE[0])
-  ) reset_sync2 (
+  ) data_sync_reg2 (
   .C  (clk),
-  .CE (enable),
-  .PRE(reset_in),
-  .D  (reset_sync_reg1),
-  .Q  (reset_sync_reg2)
+  .D  (data_sync1),
+  .Q  (data_sync2),
+  .CE (1'b1),
+  .R  (1'b0)
   );
 
   (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *)
-  FDPE #(
+  FDRE #(
    .INIT (INITIALISE[0])
-  ) reset_sync3 (
+  ) data_sync_reg3 (
   .C  (clk),
-  .CE (enable),
-  .PRE(reset_in),
-  .D  (reset_sync_reg2),
-  .Q  (reset_sync_reg3)
+  .D  (data_sync2),
+  .Q  (data_sync3),
+  .CE (1'b1),
+  .R  (1'b0)
   );
 
   (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *)
-  FDPE #(
+  FDRE #(
    .INIT (INITIALISE[0])
-  ) reset_sync4 (
+  ) data_sync_reg4 (
   .C  (clk),
-  .CE (enable),
-  .PRE(reset_in),
-  .D  (reset_sync_reg3),
-  .Q  (reset_sync_reg4)
+  .D  (data_sync3),
+  .Q  (data_sync4),
+  .CE (1'b1),
+  .R  (1'b0)
   );
 
-
-assign reset_out = reset_sync_reg4;
+  assign data_out = data_sync4;
 
 
 endmodule
+
+

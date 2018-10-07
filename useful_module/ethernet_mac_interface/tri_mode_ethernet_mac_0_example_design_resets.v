@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_example_design_resets.v
+// File       : tri_mode_ethernet_mac_0_example_design_resets.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2012 Xilinx, Inc. All rights reserved.
@@ -51,7 +51,7 @@
 // Description:  This block generates fully synchronous resets for each clock domain
 `timescale 1 ps/1 ps
 
-module ethernet_interface_example_design_resets
+module tri_mode_ethernet_mac_0_example_design_resets
    (
    // clocks
    input          s_axi_aclk,
@@ -71,14 +71,14 @@ module ethernet_interface_example_design_resets
    
    output   reg   gtx_resetn = 0,
    
-   output   reg   vector_resetn = 0,
+   output   reg   s_axi_resetn = 0,
    output         phy_resetn,
    output   reg   chk_resetn = 0
    );
 
 // define internal signals
-    reg           vector_pre_resetn = 0;
-    wire          vector_reset_int;
+    reg           s_axi_pre_resetn = 0;
+    wire          s_axi_reset_int;
     
     reg           gtx_pre_resetn = 0;
     wire          gtx_clk_reset_int;
@@ -92,7 +92,7 @@ module ethernet_interface_example_design_resets
   //----------------------------------------------------------------------------
   // Synchronise the async dcm_locked into the gtx_clk clock domain
   //----------------------------------------------------------------------------
-  ethernet_interface_sync_block dcm_sync (
+  tri_mode_ethernet_mac_0_sync_block dcm_sync (
      .clk              (gtx_clk),
      .data_in          (dcm_locked),
      .data_out         (dcm_locked_sync)
@@ -106,7 +106,7 @@ module ethernet_interface_example_design_resets
 
   //---------------
   // global reset
-   ethernet_interface_reset_sync glbl_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync glbl_reset_gen (
       .clk              (gtx_clk),
       .enable           (dcm_locked_sync),
       .reset_in         (glbl_rst),
@@ -116,29 +116,26 @@ module ethernet_interface_example_design_resets
    assign glbl_rst_intn = !glbl_rst_int;
 
 
+
   //---------------
-  // Vector controller reset
-   ethernet_interface_reset_sync vector_reset_gen (
-      
-      .clk              (gtx_clk),
-   
-      .enable           (dcm_locked_sync),
+  // AXI-Lite reset
+   tri_mode_ethernet_mac_0_reset_sync axi_lite_reset_gen (
+      .clk              (s_axi_aclk),
+      .enable           (phy_resetn_int),
       .reset_in         (glbl_rst),
-      .reset_out        (vector_reset_int)
+      .reset_out        (s_axi_reset_int)
    );
 
    // Create fully synchronous reset in the s_axi clock domain.
-   
-   always @(posedge gtx_clk)
-   
+   always @(posedge s_axi_aclk)
    begin
-     if (vector_reset_int) begin
-       vector_pre_resetn <= 0;
-       vector_resetn     <= 0;
+     if (s_axi_reset_int) begin
+       s_axi_pre_resetn <= 0;
+       s_axi_resetn     <= 0;
      end
      else begin
-       vector_pre_resetn <= 1;
-       vector_resetn     <= vector_pre_resetn;
+       s_axi_pre_resetn <= 1;
+       s_axi_resetn     <= s_axi_pre_resetn;
      end
    end
 
@@ -146,7 +143,7 @@ module ethernet_interface_example_design_resets
   
   // gtx_clk reset
   
-   ethernet_interface_reset_sync gtx_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync gtx_reset_gen (
       
       .clk              (gtx_clk),
       
@@ -173,7 +170,7 @@ module ethernet_interface_example_design_resets
 
   //---------------
   // data check reset
-   ethernet_interface_reset_sync chk_reset_gen (
+   tri_mode_ethernet_mac_0_reset_sync chk_reset_gen (
       
       .clk              (gtx_clk),
       

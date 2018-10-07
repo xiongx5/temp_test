@@ -3,7 +3,7 @@
 // Version    : 1.2
 // Project    : Tri-Mode Ethernet MAC
 //------------------------------------------------------------------------------
-// File       : ethernet_interface_ten_100_1g_eth_fifo.v
+// File       : tri_mode_ethernet_mac_0_ten_100_1g_eth_fifo.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2004-2008 Xilinx, Inc. All rights reserved.
@@ -68,7 +68,7 @@
 // The module declaration for the FIFO
 //------------------------------------------------------------------------------
 
-module ethernet_interface_ten_100_1g_eth_fifo #
+module tri_mode_ethernet_mac_0_ten_100_1g_eth_fifo #
   (
     parameter FULL_DUPLEX_ONLY = 1
   )
@@ -123,7 +123,7 @@ module ethernet_interface_ten_100_1g_eth_fifo #
   //----------------------------------------------------------------------------
   // Instantiate the Transmitter FIFO
   //----------------------------------------------------------------------------
-  ethernet_interface_tx_client_fifo #
+  tri_mode_ethernet_mac_0_tx_client_fifo #
   (
     .FULL_DUPLEX_ONLY (FULL_DUPLEX_ONLY)
   )
@@ -156,7 +156,7 @@ module ethernet_interface_ten_100_1g_eth_fifo #
   //----------------------------------------------------------------------------
   // Instantiate the Receiver FIFO
   //----------------------------------------------------------------------------
-  ethernet_interface_rx_client_fifo rx_fifo_i
+  tri_mode_ethernet_mac_0_rx_client_fifo rx_fifo_i
   (
     .rx_fifo_aclk       (rx_fifo_aclk),
     .rx_fifo_resetn     (rx_fifo_resetn),

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// File       : ethernet_interface_support_clocking.v
+// File       : tri_mode_ethernet_mac_0_support_clocking.v
 // Author     : Xilinx Inc.
 // -----------------------------------------------------------------------------
 // (c) Copyright 2013 Xilinx, Inc. All rights reserved.
@@ -64,7 +64,7 @@
 `timescale 1ns / 1ps
 
 //***************************** Entity Declaration ****************************
-module ethernet_interface_support_clocking (
+module tri_mode_ethernet_mac_0_support_clocking (
   // Clock in ports
   input         clk_in1,
   // Clock out ports

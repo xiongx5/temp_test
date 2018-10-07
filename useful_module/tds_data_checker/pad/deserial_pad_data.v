@@ -485,8 +485,11 @@ endfunction
      end
      end
      
+    wire disconnect;
+    assign disconnect = (rx_data_r1 == rx_data_r2) &  (rx_data_r2 == rx_data_r3) & (rx_data_r3 == rx_data_r4) & (rx_data_r4 == rx_data_r5);
+
     wire [18:0] monitor_meesage;
-    assign monitor_meesage = {state,locked,syn_cnt,err_cnt};//[3:0],[0:0],[8:0],[4:0]
+    assign monitor_meesage = {state,locked&(~disconnect),syn_cnt,err_cnt};//[3:0],[0:0],[8:0],[4:0]
 
     fifo_pad_error_syn fifo_pad_error_syn_inst (
         .rst(reset_160M),        // input wire rst

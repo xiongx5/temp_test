@@ -44,7 +44,12 @@ module sTGC_TDS_data_log(
     output        rgmii_txc,
     input  [3:0]  rgmii_rxd,
     input         rgmii_rx_ctl,
-    input         rgmii_rxc
+    input         rgmii_rxc,
+    
+     // MDIO Interface
+    //---------------
+    inout         mdio,
+    output        mdc    
 );
 
 	wire clk160;
@@ -231,8 +236,8 @@ module sTGC_TDS_data_log(
 
 	ethernet_mac_interface ethernet_mac_interface_inst(
 		.glbl_rst            (reset_VIO),
-		.eth_clk_in_p        (eth_clk_in_p),
-		.eth_clk_in_n        (eth_clk_in_n),
+		.clk_in_p        (eth_clk_in_p),
+		.clk_in_n        (eth_clk_in_n),
 		.gtx_clk_bufg_out    (gtx_clk_bufg_out),
 		.phy_resetn          (phy_resetn),
 		.rgmii_txd           (rgmii_txd),
@@ -241,6 +246,9 @@ module sTGC_TDS_data_log(
 		.rgmii_rxd           (rgmii_rxd),
 		.rgmii_rx_ctl        (rgmii_rx_ctl),
 		.rgmii_rxc           (rgmii_rxc),
+		
+		.mdio(mdio),
+        .mdc(mdc),
 		.rx_axis_fifo_tdata  (rx_axis_fifo_tdata),
 		.rx_axis_fifo_tvalid (rx_axis_fifo_tvalid),
 		.rx_axis_fifo_tready (rx_axis_fifo_tready),
