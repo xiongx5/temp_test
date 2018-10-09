@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-05 13:56:29
+//  Last Modified : 2018-10-09 14:45:08
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -160,6 +160,7 @@ module sTGC_TDS_data_log(
 	wire rx_axis_fifo_tlast;
 	wire gtx_clk_bufg_out;
 
+	wire debug_enable_VIO;
 	readout_control inst_readout_control(
 			.clk                    (clk160),
 			.reset                  (reset_VIO),
@@ -170,6 +171,8 @@ module sTGC_TDS_data_log(
 
 			.counter_th             (counter_th_VIO),
 			.idle_counter_number_th (idle_counter_number_th_VIO),
+			.debug_enable			(debug_enable_VIO),
+
 
 			.channel_linked         ({4'b0000,channel_linked}),
 
@@ -266,7 +269,8 @@ module sTGC_TDS_data_log(
 	  .probe_out3(D_MAC_add_VIO),//output wire [47 : 0] probe_out3
 	  .probe_out4(S_MAC_add_VIO),//output wire [47 : 0] probe_out4
 	  .probe_out5(counter_th_VIO),//output wire [11 : 0] probe_out5
-	  .probe_out6(idle_counter_number_th_VIO)//output wire [11 : 0] probe_out6
+	  .probe_out6(idle_counter_number_th_VIO),//output wire [11 : 0] probe_out6
+	  .probe_out7(debug_enable_VIO)//output wire [0 : 0] probe_out7
 	);
 
 

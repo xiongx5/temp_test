@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-07 12:40:30
+//  Last Modified : 2018-10-09 15:03:04
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -21,6 +21,7 @@ module readout_control(
 	
 	input [11:0] counter_th,
 	input [11:0] idle_counter_number_th, 
+	input debug_enable,
 
 	input [7:0] channel_linked,
 
@@ -86,13 +87,28 @@ module readout_control(
 	input channel_fifo_empty_7
 );
 
+reg [11:0] sample_cycle_counter = 12'h0;
+always @(posedge clk) begin
+	if (reset) begin
+		// reset
+		sample_cycle_counter <= 12'b0;
+	end	begin
+		sample_cycle_counter <= (sample_cycle_counter == counter_th) ? 12'b0 : (sample_cycle_counter + 12'b1); 
+	end
+end
+
 reg [11:0] cycle_counter = 12'h0;
+wire cycle_counter_pasue ;
 always @(posedge clk) begin
 	if (reset) begin
 		// reset
 		cycle_counter <= 12'b0;
 	end	begin
-		cycle_counter <= (cycle_counter == counter_th) ? 12'b0 : (cycle_counter + 12'b1); 
+		if(sample_cycle_counter == counter_th)begin
+			cycle_counter <= 12'b0;
+		end else begin
+			cycle_counter <= cycle_counter_pasue ? cycle_counter : cycle_counter +12'b1;
+		end
 	end
 end
 
@@ -106,7 +122,7 @@ always @(posedge clk ) begin
 	if (reset) begin
 		readout_processing <= 1'b0;		
 	end	else if (cycle_counter == start_point) begin
-		readout_processing <= (|channel_not_empty_r) | idle_cylce;
+		readout_processing <= (|channel_not_empty) | idle_cylce;
 	end else if(cycle_counter == start_point + 12'h012)begin
 		readout_processing <= 1'b0;
 	end
@@ -116,6 +132,7 @@ end
 reg [7:0] channel_not_empty_r = 8'b0000_0000;
 wire [7:0] channel_not_empty;
 reg [7:0] channel_not_empty_r_one_hot;
+reg idle_cylce_r;
 
 assign channel_not_empty = ~{channel_fifo_empty_7,channel_fifo_empty_6,channel_fifo_empty_5,channel_fifo_empty_4,
 							 channel_fifo_empty_3,channel_fifo_empty_2,channel_fifo_empty_1,channel_fifo_empty_0};
@@ -125,10 +142,21 @@ always @(posedge clk) begin
 		channel_not_empty_r <= 8'b0000_0000;
 	end else if(cycle_counter == start_point) begin
 		channel_not_empty_r <= channel_not_empty;
-	end else if(cycle_counter <= start_point + 12'h00f) begin
-		channel_not_empty_r <= (channel_not_empty_r ==  channel_not_empty_r_one_hot)? channel_not_empty : (channel_not_empty_r & (~channel_not_empty_r_one_hot)) ;
+	end else if((cycle_counter <= start_point + 12'h00f) & (cycle_counter > start_point) &(~idle_cylce_r) )begin
+		channel_not_empty_r <= (~|channel_not_empty_r)? channel_not_empty : (channel_not_empty_r & (~channel_not_empty_r_one_hot)) ;
 	end else begin
 		channel_not_empty_r <= 8'b0000_0000;
+	end
+end
+
+assign cycle_counter_pasue = (channel_not_empty_r ==  channel_not_empty_r_one_hot) & (|channel_not_empty_r);
+reg cycle_counter_pasue_r;
+always @(posedge clk) begin
+	if (reset) begin
+		// reset
+		cycle_counter_pasue_r <= 1'b0;
+	end else begin
+		cycle_counter_pasue_r <= cycle_counter_pasue;
 	end
 end
 
@@ -148,19 +176,19 @@ always @(*) begin
 end
 
 reg [11:0] idle_cyle_num;
-wire  idle_cylce; assign  idle_cylce =  idle_cyle_num == idle_counter_number_th;
+wire  idle_cylce; assign  idle_cylce =  (idle_cyle_num == idle_counter_number_th) & debug_enable;
 always @(posedge clk ) begin
 	if (reset) begin
 		idle_cyle_num <= 12'b0;		
 	end	else if(cycle_counter == start_point)begin
-		idle_cyle_num <= ((|channel_not_empty_r) | idle_cylce) ? 12'b0 : idle_cyle_num + 12'b1;
+		idle_cyle_num <= ((|channel_not_empty) | idle_cylce) ? 12'b0 : idle_cyle_num + 12'b1;
 	end 
 end
 
-reg idle_cylce_r;
+
 always @(posedge clk)begin
 	if(cycle_counter == start_point)begin
-		idle_cylce_r <= idle_cylce;
+		idle_cylce_r <= idle_cylce & (~|channel_not_empty);
 	end
 end
 
@@ -193,11 +221,11 @@ always @(posedge clk ) begin
 		packet_count <= 8'b0;
 	end	else if (cycle_counter == start_point) begin
 		eth_fifo_data  <= {D_MAC_add,S_MAC_add,packet_count,8'h00,8'hff};
-		eth_fifo_write <= |channel_not_empty_r |idle_cylce;	
-		packet_count <= (|channel_not_empty_r |idle_cylce) ? (packet_count + 8'b1) : packet_count;
+		eth_fifo_write <= |channel_not_empty |idle_cylce;	
+		packet_count <= (|channel_not_empty |idle_cylce) ? (packet_count + 8'b1) : packet_count;
 	end else if((cycle_counter <= start_point + 12'h0010)&(cycle_counter >= start_point+12'h001))begin
-		eth_fifo_data  <= (idle_cylce_r | (|channel_not_empty_r_one_hot))? {104'b0,4'b1111,4'b000,channel_linked} : effictive_data;
-		eth_fifo_write <= readout_processing;	
+		eth_fifo_data  <= (idle_cylce_r | (~|channel_not_empty_r_one_hot))? {104'b0,4'b1111,4'b000,channel_linked} : effictive_data;
+		eth_fifo_write <= readout_processing & ~cycle_counter_pasue_r;	
 	end else if(cycle_counter == start_point + 12'h0011) begin
 		eth_fifo_data  <= {channel_data_counter_7,channel_data_counter_6,channel_data_counter_5,channel_data_counter_4,
 							channel_data_counter_3,channel_data_counter_2,channel_data_counter_1,channel_data_counter_0,40'hffffffffff};
@@ -231,7 +259,7 @@ always @(posedge clk) begin
 		// reset
 		data_tran_stop <= 1'b0;
 	end	else if ((cycle_counter >= start_point + 12'h0010)&(cycle_counter <= start_point + 12'h0017)) begin
-		data_tran_stop <= 1'b1;
+		data_tran_stop <= ~idle_cylce_r;//1'b1;
 	end else begin
 		data_tran_stop <= 1'b0;
 	end
@@ -252,7 +280,7 @@ always @(posedge clk) begin
 		// reset
 		channel_fifo_s_reset <= 1'b0;
 	end	else if ((cycle_counter >= start_point + 12'h0011)&(cycle_counter <= start_point + 12'h0013)) begin
-		channel_fifo_s_reset <= 1'b1;
+		channel_fifo_s_reset <= ~idle_cylce_r;//1'b1;
 	end else begin
 		channel_fifo_s_reset <= 1'b0;
 	end
@@ -389,27 +417,28 @@ always @(posedge mac_clk) begin
 	end
 end
 
-
   readout_control_ila readout_control_ila_inst (
     .clk(clk), // input wire clk
 
     .probe0(cycle_counter), // input wire [11:0] probe0
-    .probe1(packet_count), // input wire [7:0] probe1
-    .probe2(counter_th), // input wire [11:0] probe2
-    .probe3(start_point), // input wire [11:0] probe3
-    .probe4(readout_processing), // input wire [0:0] probe4
-    .probe5(channel_not_empty_r), // input wire [7:0] probe5
-    .probe6(channel_not_empty), // input wire [7:0] probe6
-    .probe7(channel_not_empty_r_one_hot), // input wire [7:0] probe7
-    .probe8(idle_cyle_num), // input wire [11:0] probe8
-    .probe9(idle_counter_number_th), // input wire [11:0] probe9
-    .probe10(idle_cylce), // input wire [0:0] prob10
-    .probe11(idle_cylce_r), // input wire [0:0] probe11
+    .probe1(sample_cycle_counter),//input wire [11:0] probe1
+    .probe2(cycle_counter_pasue),//input wire [0:0] probe2
+    .probe3(packet_count), // input wire [7:0] probe3
+    .probe4(counter_th), // input wire [11:0] probe4
+    .probe5(start_point), // input wire [11:0] probe5
+    .probe6(readout_processing), // input wire [0:0] probe6
+    .probe7(channel_not_empty_r), // input wire [7:0] probe7
+    .probe8(channel_not_empty), // input wire [7:0] probe8
+    .probe9(channel_not_empty_r_one_hot), // input wire [7:0] probe9
+    .probe10(idle_cyle_num), // input wire [11:0] probe10
+    .probe11(idle_counter_number_th), // input wire [11:0] probe11
+    .probe12(idle_cylce), // input wire [0:0] prob12
+    .probe13(idle_cylce_r), // input wire [0:0] probe13
 
-    .probe12(eth_fifo_data), // input wire [119:0] probe12
-    .probe13(eth_fifo_write), // input wire [0:0] probe13
-    .probe14(data_tran_stop), // input wire [0:0] probe14  
-    .probe15(channel_fifo_s_reset) // input wire [0:0] probe15
+    .probe14(eth_fifo_data), // input wire [119:0] probe14
+    .probe15(eth_fifo_write), // input wire [0:0] probe15
+    .probe16(data_tran_stop), // input wire [0:0] probe16  
+    .probe17(channel_fifo_s_reset) // input wire [0:0] probe17
   );
   readout_control_mac_ila readout_control_mac_ila_inst (
     .clk(mac_clk), // input wire clk
