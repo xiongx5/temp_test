@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : strip_pad_data_decoder.v
 //  Created On    : 2018-10-01 10:28:08
-//  Last Modified : 2018-10-06 11:23:18
+//  Last Modified : 2018-10-11 15:57:44
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -24,6 +24,8 @@ module strip_pad_data_decoder(
     output strip_linked,
     output pad_linked,
 
+    output data_valid_flag,
+
     // output [119:0] strip_data_out,
     // output strip_empty,
     // output [119:0] pad_data_out,
@@ -38,6 +40,14 @@ module strip_pad_data_decoder(
     output channel_fifo_empty
     );
 
+reg [639:0] GTP_data_in_delay;
+always @(posedge data_clk) begin
+  GTP_data_in_delay <= {GTP_data_in_delay[619:0],GTP_data_in};
+end
+wire [19:0] GTP_data_delay;
+assign GTP_data_delay = GTP_data_in_delay[639:620];
+
+
 
   wire [3:0] strip_state;
   wire [9:0] strip_syn_cnt;
@@ -49,7 +59,7 @@ module strip_pad_data_decoder(
   wire [119:0] strip_data_bridge;
   deserial_strip_data  deserial_strip_data_inst(
       // User Interface
-      .RX_DATA_IN(GTP_data_in),
+      .RX_DATA_IN(GTP_data_delay),
       // System Interface
       .clk160(clk_readout),
       .USER_CLK(data_clk),
@@ -98,7 +108,7 @@ module strip_pad_data_decoder(
   wire [119:0] pad_data_bridge;
   deserial_pad_data  deserial_pad_data_inst(
       // User Interface
-      .RX_DATA_IN(GTP_data_in),
+      .RX_DATA_IN(GTP_data_delay),
       // System Interface
       .clk160(clk_readout),
       .USER_CLK(data_clk),
@@ -122,7 +132,8 @@ module strip_pad_data_decoder(
       .err_cnt(pad_err_cnt),
 
       .data_valid(pad_data_valid_inner),
-      .data_out(pad_data_inner)
+      .data_out(pad_data_inner),
+      .data_valid_flag(data_valid_flag)
   );
 
   bridge_fifo pad_bridge_fifo (

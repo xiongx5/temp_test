@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : channel_data_4.v
 //  Created On    : 2018-10-03 17:51:38
-//  Last Modified : 2018-10-05 22:03:45
+//  Last Modified : 2018-10-11 15:58:31
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -41,6 +41,7 @@ module channel_data_4(
 
     input tds_mode,
     output [3:0] channel_linked,
+    output [3:0] data_valid_flag,
 
     input channel_fifo_s_reset_0,
     input data_tran_stop_0,
@@ -143,6 +144,7 @@ module channel_data_4(
     
         .strip_linked(strip_linked),
         .pad_linked(pad_linked),
+        .data_valid_flag(data_valid_flag),
     
         // .strip_data_out({strip_data_3,strip_data_2,strip_data_1,strip_data_0}),
         // .strip_empty({strip_empty_3,strip_empty_2,strip_empty_1,strip_empty_0}),

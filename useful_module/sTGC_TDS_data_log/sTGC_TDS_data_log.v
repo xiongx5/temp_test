@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-09 14:45:08
+//  Last Modified : 2018-10-11 16:08:23
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -49,8 +49,17 @@ module sTGC_TDS_data_log(
      // MDIO Interface
     //---------------
     inout         mdio,
-    output        mdc    
+    output        mdc,
+
+    input trigger_in_p,
+    input trigger_in_n,
+
+    output reg [4:0] debug_port
 );
+
+
+
+
 
 	wire clk160;
 	wire clk40;
@@ -58,7 +67,11 @@ module sTGC_TDS_data_log(
 	wire [47:0] D_MAC_add_VIO;
 	wire [47:0] S_MAC_add_VIO;
 	wire [11:0] counter_th_VIO;
-	wire [11:0] idle_counter_number_th_VIO;
+	wire [15:0] idle_counter_number_th_VIO;
+
+	wire [3:0] data_valid_flag;
+    wire trigger;
+
 	
 	clock_master clock_master_inst(
 	 // Clock in ports
@@ -67,6 +80,26 @@ module sTGC_TDS_data_log(
 	  // Clock out ports
 	  .clk_out1(clk40),     // output clk_out1
 	  .clk_out2(clk160));    // output clk_out2
+
+
+	wire enable_trigger_VIO;
+	wire [9:0] trigger_width_VIO;
+	wire enbale_trigger_VIO;
+	//wire trigger;
+	trigger_process inst_trigger_process(
+		.clk            (clk160),
+		.trigger_in_p   (trigger_in_p),
+		.trigger_in_n   (trigger_in_n),
+		.trigger_width  (trigger_width_VIO),
+		.enbale_trigger (enbale_trigger_VIO),
+		.trigger        (trigger)
+	);
+
+
+
+	always @(posedge clk160) begin
+		debug_port <= {trigger,data_valid_flag};
+	end
 	
 	wire reset_VIO;
 	wire TDS_mode_VIO; //0 for pad mode, 1 for srtrip mode
@@ -96,6 +129,7 @@ module sTGC_TDS_data_log(
     wire  [9:0] channel_data_counter_3;
 
     wire [3:0] channel_linked;
+
 	channel_data_4 inst_channel_data_4		(
 			.GTP_CLK_p              (GTP_CLK_p),
 			.GTP_CLK_n              (GTP_CLK_n),
@@ -115,9 +149,10 @@ module sTGC_TDS_data_log(
 			.serial_data_in_n_3     (serial_data_in_n_3),
 
 			.tds_mode               (TDS_mode_VIO),
-			.enable					(enable_VIO),
+			.enable					(enable_VIO&{4{trigger}}),
 
 			.channel_linked         (channel_linked),
+			.data_valid_flag		(data_valid_flag),
 
 			.channel_fifo_s_reset_0 (channel_fifo_s_reset_0),
 			.data_tran_stop_0       (data_tran_stop_0),
@@ -269,8 +304,10 @@ module sTGC_TDS_data_log(
 	  .probe_out3(D_MAC_add_VIO),//output wire [47 : 0] probe_out3
 	  .probe_out4(S_MAC_add_VIO),//output wire [47 : 0] probe_out4
 	  .probe_out5(counter_th_VIO),//output wire [11 : 0] probe_out5
-	  .probe_out6(idle_counter_number_th_VIO),//output wire [11 : 0] probe_out6
-	  .probe_out7(debug_enable_VIO)//output wire [0 : 0] probe_out7
+	  .probe_out6(idle_counter_number_th_VIO),//output wire [15 : 0] probe_out6
+	  .probe_out7(debug_enable_VIO),//output wire [0 : 0] probe_out7
+	  .probe_out8(enbale_trigger_VIO),//output wire [0 : 0] probe_out8
+	  .probe_out9(trigger_width_VIO)//output wire [9 : 0] probe_out9
 	);
 
 

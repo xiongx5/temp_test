@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-09 15:03:04
+//  Last Modified : 2018-10-10 21:31:30
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -20,7 +20,7 @@ module readout_control(
 	input [47:0] S_MAC_add,
 	
 	input [11:0] counter_th,
-	input [11:0] idle_counter_number_th, 
+	input [15:0] idle_counter_number_th, 
 	input debug_enable,
 
 	input [7:0] channel_linked,
@@ -175,13 +175,13 @@ always @(*) begin
 	endcase
 end
 
-reg [11:0] idle_cyle_num;
+reg [15:0] idle_cyle_num;
 wire  idle_cylce; assign  idle_cylce =  (idle_cyle_num == idle_counter_number_th) & debug_enable;
 always @(posedge clk ) begin
 	if (reset) begin
-		idle_cyle_num <= 12'b0;		
+		idle_cyle_num <= 16'b0;		
 	end	else if(cycle_counter == start_point)begin
-		idle_cyle_num <= ((|channel_not_empty) | idle_cylce) ? 12'b0 : idle_cyle_num + 12'b1;
+		idle_cyle_num <= ((|channel_not_empty) | idle_cylce) ? 16'b0 : idle_cyle_num + 16'b1;
 	end 
 end
 
@@ -430,8 +430,8 @@ end
     .probe7(channel_not_empty_r), // input wire [7:0] probe7
     .probe8(channel_not_empty), // input wire [7:0] probe8
     .probe9(channel_not_empty_r_one_hot), // input wire [7:0] probe9
-    .probe10(idle_cyle_num), // input wire [11:0] probe10
-    .probe11(idle_counter_number_th), // input wire [11:0] probe11
+    .probe10(idle_cyle_num), // input wire [15:0] probe10
+    .probe11(idle_counter_number_th), // input wire [15:0] probe11
     .probe12(idle_cylce), // input wire [0:0] prob12
     .probe13(idle_cylce_r), // input wire [0:0] probe13
 
