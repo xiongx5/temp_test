@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     int iPacket=0;  //packet counter
     string run_id;
     string verbose;
-    if (argc!=4){cout<<"Usage: sudo ./eth.exe numpacket -verbose on/off"<<endl; return 0;}
+    if (argc!=4){cout<<"Usage: sudo ./mac_daq run_name -verbose on/off"<<endl; return 0;}
     else {
 	run_id=argv[1];
 	verbose=argv[3];
@@ -114,14 +114,46 @@ int main(int argc, char **argv)
     cout<<"run pid is: "<<getpid()<<endl;
 
 
-    /* open the ethernet device*/
-    dev = pcap_lookupdev(err_buf);
-    if (dev==NULL){
-        cout<<"Could not find device "<<dev<<" : "<<err_buf<<endl;
-        return -1;
-    }else{
-	printf("Found Device %s\n",dev);
+    pcap_if_t *alldevs;
+    pcap_if_t *d;
+    int i = 0;
+
+    if (pcap_findalldevs( &alldevs, err_buf) == -1)
+    {
+        cerr <<"Error in pcap_findalldevs_ex:"<< err_buf << endl;
+        exit(1);
     }
+    for(d= alldevs; d != NULL; d= d->next)
+    {
+        cout << ++i << ":"<< d->name <<"    ";
+        if (d->description)
+            cout << d->description << endl;
+        else
+            cout<< "(No description available)" << endl;
+    }
+    int device_number;
+    cout << "plese select your etherner device: ";
+    cin >> device_number;
+    d= alldevs;
+    for(i=0; i < device_number -1; i++){
+        d=d->next;        
+    }
+    cout << ++i << ":"<< d->name <<"    ";
+    if (d->description)
+        cout << d->description << endl;
+    else
+        cout<< "(No description available)" << endl;
+
+
+    /* open the ethernet device*/
+    //dev = pcap_lookupdev(err_buf);
+    //if (dev==NULL){
+    //    cout<<"Could not find device "<<dev<<" : "<<err_buf<<endl;
+    //    return -1;
+    //}else{
+	//printf("Found Device %s\n",dev);
+    //}
+    dev = d->name;
     pcap_handle = pcap_open_live(dev,65536,1,10000, err_buf);  //device name, snap length, promiscuous mode, to_ms, error_buffer
     if (pcap_handle==NULL){
         cout<<"Could not open device "<<dev<<" : "<<err_buf<<endl;
@@ -146,11 +178,12 @@ int main(int argc, char **argv)
     //while(packet_receiver()!=0&&iPacket<N_PACKET)
     while(packet_receiver()!=0 && daq_stop==false)
     {
-	++iPacket;
-	if(verbose=="on") cout<<"Packet #"<<iPacket<<endl;
+	   ++iPacket;
+	   if(verbose=="on") cout<<"Packet #"<<iPacket<<endl;
     }
 
     /* clean up and close pcap */
+    pcap_freealldevs(alldevs);
     pcap_freecode(&fcode);
     pcap_close(pcap_handle);
     fclose(fp);
