@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-11 16:08:23
+//  Last Modified : 2018-10-12 13:00:01
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -85,6 +85,8 @@ module sTGC_TDS_data_log(
 	wire enable_trigger_VIO;
 	wire [9:0] trigger_width_VIO;
 	wire enbale_trigger_VIO;
+	wire [7:0] trigger_index;
+	wire cycle_tick;
 	//wire trigger;
 	trigger_process inst_trigger_process(
 		.clk            (clk160),
@@ -92,7 +94,9 @@ module sTGC_TDS_data_log(
 		.trigger_in_n   (trigger_in_n),
 		.trigger_width  (trigger_width_VIO),
 		.enbale_trigger (enbale_trigger_VIO),
-		.trigger        (trigger)
+		.trigger        (trigger),
+		.trigger_index  (trigger_index),
+		.cycle_tick		(cycle_tick)
 	);
 
 
@@ -207,6 +211,8 @@ module sTGC_TDS_data_log(
 			.counter_th             (counter_th_VIO),
 			.idle_counter_number_th (idle_counter_number_th_VIO),
 			.debug_enable			(debug_enable_VIO),
+			.cycle_tick				(cycle_tick),
+			.trigger_index			(trigger_index),
 
 
 			.channel_linked         ({4'b0000,channel_linked}),

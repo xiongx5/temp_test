@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-10 21:31:30
+//  Last Modified : 2018-10-12 12:59:25
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -22,6 +22,8 @@ module readout_control(
 	input [11:0] counter_th,
 	input [15:0] idle_counter_number_th, 
 	input debug_enable,
+	output cycle_tick,
+	input [7:0] trigger_index,
 
 	input [7:0] channel_linked,
 
@@ -96,6 +98,8 @@ always @(posedge clk) begin
 		sample_cycle_counter <= (sample_cycle_counter == counter_th) ? 12'b0 : (sample_cycle_counter + 12'b1); 
 	end
 end
+
+assign cycle_tick = (sample_cycle_counter == counter_th);
 
 reg [11:0] cycle_counter = 12'h0;
 wire cycle_counter_pasue ;
@@ -220,7 +224,7 @@ always @(posedge clk ) begin
 		eth_fifo_write <= 1'b0;	
 		packet_count <= 8'b0;
 	end	else if (cycle_counter == start_point) begin
-		eth_fifo_data  <= {D_MAC_add,S_MAC_add,packet_count,8'h00,8'hff};
+		eth_fifo_data  <= {D_MAC_add,S_MAC_add,{trigger_index[0],packet_count[6:0]},8'h00,8'hff};
 		eth_fifo_write <= |channel_not_empty |idle_cylce;	
 		packet_count <= (|channel_not_empty |idle_cylce) ? (packet_count + 8'b1) : packet_count;
 	end else if((cycle_counter <= start_point + 12'h0010)&(cycle_counter >= start_point+12'h001))begin
