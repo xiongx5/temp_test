@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : trigger_process.v
 //  Created On    : 2018-10-10 21:41:12
-//  Last Modified : 2018-10-11 15:51:02
+//  Last Modified : 2018-10-11 22:36:58
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -47,7 +47,7 @@ module trigger_process(
    assign  trigger = enbale_trigger ? (|trigger_count|trigger_start) : 1'b1;
 
 
-   trigger_process_ila readout_control_mac_ila_inst (
+   trigger_process_ila trigger_process_ila_inst (
     .clk(clk), // input wire clk
 
     .probe0(trigger_r0), // input wire [3:0] probe0
