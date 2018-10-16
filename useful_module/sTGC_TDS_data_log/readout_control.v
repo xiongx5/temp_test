@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-12 12:59:25
+//  Last Modified : 2018-10-16 19:06:57
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -164,19 +164,42 @@ always @(posedge clk) begin
 	end
 end
 
+// always @(*) begin
+// 	case(channel_not_empty_r)
+// 		8'b1???????: channel_not_empty_r_one_hot = 8'b1000_0000;
+// 		8'b01??????: channel_not_empty_r_one_hot = 8'b0100_0000;
+// 		8'b001?????: channel_not_empty_r_one_hot = 8'b0010_0000;
+// 		8'b0001????: channel_not_empty_r_one_hot = 8'b0001_0000;
+// 		8'b00001???: channel_not_empty_r_one_hot = 8'b0000_1000;
+// 		8'b000001??: channel_not_empty_r_one_hot = 8'b0000_0100;
+// 		8'b0000001?: channel_not_empty_r_one_hot = 8'b0000_0010;
+// 		8'b00000001: channel_not_empty_r_one_hot = 8'b0000_0001;
+// 		8'b00000000: channel_not_empty_r_one_hot = 8'b0000_0000;
+// 		default:     channel_not_empty_r_one_hot = 8'b0000_0000;
+// 	endcase
+// end
+
 always @(*) begin
-	case(channel_not_empty_r)
-		8'b1???????: channel_not_empty_r_one_hot = 8'b1000_0000;
-		8'b01??????: channel_not_empty_r_one_hot = 8'b0100_0000;
-		8'b001?????: channel_not_empty_r_one_hot = 8'b0010_0000;
-		8'b0001????: channel_not_empty_r_one_hot = 8'b0001_0000;
-		8'b00001???: channel_not_empty_r_one_hot = 8'b0000_1000;
-		8'b000001??: channel_not_empty_r_one_hot = 8'b0000_0100;
-		8'b0000001?: channel_not_empty_r_one_hot = 8'b0000_0010;
-		8'b00000001: channel_not_empty_r_one_hot = 8'b0000_0001;
-		8'b00000000: channel_not_empty_r_one_hot = 8'b0000_0000;
-		default:     channel_not_empty_r_one_hot = 8'b0000_0000;
-	endcase
+	if (channel_not_empty_r[7]) begin
+		channel_not_empty_r_one_hot = 8'b1000_0000;
+	end else if(channel_not_empty_r[6]) begin
+		channel_not_empty_r_one_hot = 8'b0100_0000;
+	end else if(channel_not_empty_r[5]) begin
+		channel_not_empty_r_one_hot = 8'b0010_0000;
+	end else if(channel_not_empty_r[4]) begin
+		channel_not_empty_r_one_hot = 8'b0001_0000;
+	end else if(channel_not_empty_r[3]) begin
+		channel_not_empty_r_one_hot = 8'b0000_1000;
+	end else if(channel_not_empty_r[2]) begin
+		channel_not_empty_r_one_hot = 8'b0000_0100;
+	end else if(channel_not_empty_r[1]) begin
+		channel_not_empty_r_one_hot = 8'b0000_0010;
+	end else if(channel_not_empty_r[0]) begin
+		channel_not_empty_r_one_hot = 8'b0000_0001;
+	end else begin
+		channel_not_empty_r_one_hot = 8'b0000_0000;
+	end
+
 end
 
 reg [15:0] idle_cyle_num;
