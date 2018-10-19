@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : strip_pad_data_decoder.v
 //  Created On    : 2018-10-01 10:28:08
-//  Last Modified : 2018-10-11 15:57:44
+//  Last Modified : 2018-10-18 21:12:31
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -37,7 +37,9 @@ module strip_pad_data_decoder(
     output [119:0] channel_data,
     input channel_data_read,
     output [9:0] channel_data_counter,
-    output channel_fifo_empty
+    output channel_fifo_empty,
+
+    output [119:0] debug_statistic_port
     );
 
 reg [639:0] GTP_data_in_delay;
@@ -187,5 +189,5 @@ assign GTP_data_delay = GTP_data_in_delay[639:620];
     .probe14(bridge_fifo_data), // input wire [119:0] probe14  
     .probe15(channel_data) // input wire [119:0] probe15
   );
-
+assign debug_statistic_port = {4'b0000,pad_data};
 endmodule

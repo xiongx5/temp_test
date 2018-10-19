@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : channel_data_4.v
 //  Created On    : 2018-10-03 17:51:38
-//  Last Modified : 2018-10-11 15:58:31
+//  Last Modified : 2018-10-18 21:14:57
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -49,6 +49,7 @@ module channel_data_4(
     output [119:0] channel_data_0,    
     output [9:0] channel_data_counter_0,
     output channel_fifo_empty_0,
+    output [119:0] debug_statistic_port_0,
 
     input channel_fifo_s_reset_1,
     input data_tran_stop_1,
@@ -56,6 +57,7 @@ module channel_data_4(
     output [119:0] channel_data_1,    
     output [9:0] channel_data_counter_1,
     output channel_fifo_empty_1,
+    output [119:0] debug_statistic_port_1,
 
     input channel_fifo_s_reset_2,
     input data_tran_stop_2,
@@ -63,13 +65,15 @@ module channel_data_4(
     output [119:0] channel_data_2,    
     output [9:0] channel_data_counter_2,
     output channel_fifo_empty_2,
+    output [119:0] debug_statistic_port_2,
 
     input channel_fifo_s_reset_3,
     input data_tran_stop_3,
     input channel_data_read_3,
     output [119:0] channel_data_3,    
     output [9:0] channel_data_counter_3,
-    output channel_fifo_empty_3
+    output channel_fifo_empty_3,
+    output [119:0] debug_statistic_port_3
     );
     // wire clk160;
     // wire clk40;
@@ -157,7 +161,8 @@ module channel_data_4(
         .channel_data({channel_data_3,channel_data_2,channel_data_1,channel_data_0}),
         .channel_data_read({channel_data_read_3,channel_data_read_2,channel_data_read_1,channel_data_read_0}),
         .channel_data_counter({channel_data_counter_3,channel_data_counter_2,channel_data_counter_1,channel_data_counter_0}),
-        .channel_fifo_empty({channel_fifo_empty_3,channel_fifo_empty_2,channel_fifo_empty_1,channel_fifo_empty_0})
+        .channel_fifo_empty({channel_fifo_empty_3,channel_fifo_empty_2,channel_fifo_empty_1,channel_fifo_empty_0}),
+        .debug_statistic_port({debug_statistic_port_3,debug_statistic_port_2,debug_statistic_port_1,debug_statistic_port_0})
         );
     assign channel_linked = tds_mode ? strip_linked : pad_linked;
 endmodule

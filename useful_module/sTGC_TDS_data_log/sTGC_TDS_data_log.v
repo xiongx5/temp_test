@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-12 13:00:01
+//  Last Modified : 2018-10-18 21:24:52
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -134,6 +134,7 @@ module sTGC_TDS_data_log(
 
     wire [3:0] channel_linked;
 
+    wire [119:0] debug_statistic_port_3,debug_statistic_port_2,debug_statistic_port_1,debug_statistic_port_0;
 	channel_data_4 inst_channel_data_4		(
 			.GTP_CLK_p              (GTP_CLK_p),
 			.GTP_CLK_n              (GTP_CLK_n),
@@ -164,6 +165,7 @@ module sTGC_TDS_data_log(
 			.channel_data_0         (channel_data_0),
 			.channel_data_counter_0 (channel_data_counter_0),
 			.channel_fifo_empty_0   (channel_fifo_empty_0),
+			.debug_statistic_port_0 (debug_statistic_port_0),
 
 			.channel_fifo_s_reset_1 (channel_fifo_s_reset_1),
 			.data_tran_stop_1       (data_tran_stop_1),
@@ -171,6 +173,7 @@ module sTGC_TDS_data_log(
 			.channel_data_1         (channel_data_1),
 			.channel_data_counter_1 (channel_data_counter_1),
 			.channel_fifo_empty_1   (channel_fifo_empty_1),
+			.debug_statistic_port_1 (debug_statistic_port_1),
 
 			.channel_fifo_s_reset_2 (channel_fifo_s_reset_2),
 			.data_tran_stop_2       (data_tran_stop_2),
@@ -178,13 +181,15 @@ module sTGC_TDS_data_log(
 			.channel_data_2         (channel_data_2),
 			.channel_data_counter_2 (channel_data_counter_2),
 			.channel_fifo_empty_2   (channel_fifo_empty_2),
+			.debug_statistic_port_2 (debug_statistic_port_2),
 
 			.channel_fifo_s_reset_3 (channel_fifo_s_reset_3),
 			.data_tran_stop_3       (data_tran_stop_3),
 			.channel_data_read_3    (channel_data_read_3),
 			.channel_data_3         (channel_data_3),
 			.channel_data_counter_3 (channel_data_counter_3),
-			.channel_fifo_empty_3   (channel_fifo_empty_3)
+			.channel_fifo_empty_3   (channel_fifo_empty_3),
+			.debug_statistic_port_3 (debug_statistic_port_3)
 		);
 
 
@@ -301,6 +306,40 @@ module sTGC_TDS_data_log(
 		.tx_axis_fifo_tvalid (tx_axis_fifo_tvalid),
 		.tx_axis_fifo_tready (tx_axis_fifo_tready),
 		.tx_axis_fifo_tlast  (tx_axis_fifo_tlast));
+
+
+
+	wire tick;
+	reg  hit_statistic;
+	wire hit_mask;
+	wire start_VIO;
+	wire reset_40_VIO;
+	wire statistic_ready_VIO;
+	wire [19:0] count_out_VIO;
+	wire [19:0] windows_VIO;
+	slow_tick_generator inst_slow_tick_generator (.clk40M(clk40), .windows(windows_VIO), .tick(tick));
+	hit_statistic_module inst_hit_statistic_module		(
+			.clk40M    (clk40),
+			.reset     (reset_40_VIO),
+			.tick      (tick),
+			.hit       (hit_statistic),
+			.start     (start_VIO),
+			.ready     (statistic_ready_VIO),
+			.count_out (count_out_VIO)
+		);
+	wire [3:0] tds_select_VIO;
+	wire [115:0] channel_select_VIO;
+	reg  [115:0] debug_statistic_port_3_r,debug_statistic_port_2_r,debug_statistic_port_1_r,debug_statistic_port_0_r;
+
+	always @(posedge clk40 ) begin
+		debug_statistic_port_3_r <= channel_select_VIO & debug_statistic_port_3[115:0] & {116{tds_select_VIO[3]}};
+		debug_statistic_port_2_r <= channel_select_VIO & debug_statistic_port_2[115:0] & {116{tds_select_VIO[2]}};
+		debug_statistic_port_1_r <= channel_select_VIO & debug_statistic_port_1[115:0] & {116{tds_select_VIO[1]}};
+		debug_statistic_port_0_r <= channel_select_VIO & debug_statistic_port_0[115:0] & {116{tds_select_VIO[0]}};
+		hit_statistic  <= (|debug_statistic_port_3_r)|(|debug_statistic_port_2_r)|(|debug_statistic_port_1_r)|(|debug_statistic_port_0_r);
+	end
+
+
 	
 	control_VIO control_VIO_top (
 	  .clk(clk160),                // input wire clk
@@ -316,5 +355,14 @@ module sTGC_TDS_data_log(
 	  .probe_out9(trigger_width_VIO)//output wire [9 : 0] probe_out9
 	);
 
-
+	statistic_VIO statistic_VIO_top (
+	  .clk(clk40),                // input wire clk
+	  .probe_in0(statistic_ready_VIO),//input wire [0 : 0] probe_in0
+	  .probe_in1(count_out_VIO),//input wire [19 : 0] probe_in1
+	  .probe_out0(start_VIO),  // output wire [0 : 0] probe_out0
+	  .probe_out1(reset_40_VIO), //output wire [0 : 0] probe_out1
+	  .probe_out2(windows_VIO), //output wire [19 : 0] probe_out2
+	  .probe_out3(tds_select_VIO),//output wire [3 : 0] probe_out3
+	  .probe_out4(channel_select_VIO)//output wire [115: 0] probe_out4
+	);
 endmodule
