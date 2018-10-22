@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-18 21:24:52
+//  Last Modified : 2018-10-22 11:18:02
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -87,6 +87,7 @@ module sTGC_TDS_data_log(
 	wire enbale_trigger_VIO;
 	wire [7:0] trigger_index;
 	wire cycle_tick;
+	wire debug_enable_trigger;
 	//wire trigger;
 	trigger_process inst_trigger_process(
 		.clk            (clk160),
@@ -96,7 +97,8 @@ module sTGC_TDS_data_log(
 		.enbale_trigger (enbale_trigger_VIO),
 		.trigger        (trigger),
 		.trigger_index  (trigger_index),
-		.cycle_tick		(cycle_tick)
+		.cycle_tick		(cycle_tick),
+		.debug_enable   (debug_enable_trigger)
 	);
 
 
@@ -104,6 +106,11 @@ module sTGC_TDS_data_log(
 	always @(posedge clk160) begin
 		debug_port <= {trigger,data_valid_flag};
 	end
+    wire debug_for_enable;
+	// always@(*)begin
+	//    debug_port = {debug_for_enable,debug_for_enable,debug_for_enable,debug_for_enable,debug_for_enable};
+	// end
+	
 	
 	wire reset_VIO;
 	wire TDS_mode_VIO; //0 for pad mode, 1 for srtrip mode
@@ -215,7 +222,7 @@ module sTGC_TDS_data_log(
 
 			.counter_th             (counter_th_VIO),
 			.idle_counter_number_th (idle_counter_number_th_VIO),
-			.debug_enable			(debug_enable_VIO),
+			.debug_enable			(debug_enable_VIO&debug_enable_trigger),
 			.cycle_tick				(cycle_tick),
 			.trigger_index			(trigger_index),
 
@@ -317,6 +324,7 @@ module sTGC_TDS_data_log(
 	wire statistic_ready_VIO;
 	wire [19:0] count_out_VIO;
 	wire [19:0] windows_VIO;
+	
 	slow_tick_generator inst_slow_tick_generator (.clk40M(clk40), .windows(windows_VIO), .tick(tick));
 	hit_statistic_module inst_hit_statistic_module		(
 			.clk40M    (clk40),
@@ -325,17 +333,18 @@ module sTGC_TDS_data_log(
 			.hit       (hit_statistic),
 			.start     (start_VIO),
 			.ready     (statistic_ready_VIO),
-			.count_out (count_out_VIO)
+			.count_out (count_out_VIO),
+			.debug     (debug_for_enable)
 		);
 	wire [3:0] tds_select_VIO;
-	wire [115:0] channel_select_VIO;
-	reg  [115:0] debug_statistic_port_3_r,debug_statistic_port_2_r,debug_statistic_port_1_r,debug_statistic_port_0_r;
+	wire [103:0] channel_select_VIO;
+	reg  [103:0] debug_statistic_port_3_r,debug_statistic_port_2_r,debug_statistic_port_1_r,debug_statistic_port_0_r;
 
 	always @(posedge clk40 ) begin
-		debug_statistic_port_3_r <= channel_select_VIO & debug_statistic_port_3[115:0] & {116{tds_select_VIO[3]}};
-		debug_statistic_port_2_r <= channel_select_VIO & debug_statistic_port_2[115:0] & {116{tds_select_VIO[2]}};
-		debug_statistic_port_1_r <= channel_select_VIO & debug_statistic_port_1[115:0] & {116{tds_select_VIO[1]}};
-		debug_statistic_port_0_r <= channel_select_VIO & debug_statistic_port_0[115:0] & {116{tds_select_VIO[0]}};
+		debug_statistic_port_3_r <= channel_select_VIO & debug_statistic_port_3[103:0] & {103{tds_select_VIO[3]}};
+		debug_statistic_port_2_r <= channel_select_VIO & debug_statistic_port_2[103:0] & {103{tds_select_VIO[2]}};
+		debug_statistic_port_1_r <= channel_select_VIO & debug_statistic_port_1[103:0] & {103{tds_select_VIO[1]}};
+		debug_statistic_port_0_r <= channel_select_VIO & debug_statistic_port_0[103:0] & {103{tds_select_VIO[0]}};
 		hit_statistic  <= (|debug_statistic_port_3_r)|(|debug_statistic_port_2_r)|(|debug_statistic_port_1_r)|(|debug_statistic_port_0_r);
 	end
 
@@ -365,4 +374,17 @@ module sTGC_TDS_data_log(
 	  .probe_out3(tds_select_VIO),//output wire [3 : 0] probe_out3
 	  .probe_out4(channel_select_VIO)//output wire [115: 0] probe_out4
 	);
+
+
+	trigger_match_monitor your_instance_name (
+		.clk(clk160), // input wire clk
+	
+	
+		.probe0(trigger), // input wire [0:0]  probe0  
+		.probe1(data_valid_flag[3]), // input wire [0:0]  probe1 
+		.probe2(data_valid_flag[2]), // input wire [0:0]  probe2 
+		.probe3(data_valid_flag[1]), // input wire [0:0]  probe3 
+		.probe4(data_valid_flag[0]) // input wire [0:0]  probe4
+	);
+
 endmodule

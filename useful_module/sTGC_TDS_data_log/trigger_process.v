@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : trigger_process.v
 //  Created On    : 2018-10-10 21:41:12
-//  Last Modified : 2018-10-12 12:27:56
+//  Last Modified : 2018-10-22 11:16:29
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -19,7 +19,8 @@ module trigger_process(
 	input enbale_trigger,
 	output  trigger,
   output  [7:0] trigger_index,
-  input cycle_tick
+  input cycle_tick,
+  output debug_enable
 	);
    wire trigger_inner;
    IBUFDS #(
@@ -38,13 +39,14 @@ module trigger_process(
         if(trigger_start)begin
           enable <= 1'b0;
           enable_1 <= 1'b0; 
-        end else if(cycle_tick & enable_1) begin
-          enable <= 1'b1;
-        end  else if(cycle_tick) begin
-          enable_1 <= 1'b1; 
+        end else if(cycle_tick) begin
+          enable_1 <= 1'b1;
+        end  else if(cycle_tick & enable_1) begin
+          enable <= 1'b1; 
+          enable_1 <= 1'b0;
         end
    end
-
+   assign  debug_enable = enbale_trigger ? enable_1 : 1'b1;
 
    reg [2:0] trigger_r0;
    always @(posedge clk ) begin

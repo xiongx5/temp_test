@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : readout_control.v
 //  Created On    : 2018-10-03 18:16:19
-//  Last Modified : 2018-10-16 19:06:57
+//  Last Modified : 2018-10-22 10:39:40
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -99,7 +99,6 @@ always @(posedge clk) begin
 	end
 end
 
-assign cycle_tick = (sample_cycle_counter == counter_th);
 
 reg [11:0] cycle_counter = 12'h0;
 wire cycle_counter_pasue ;
@@ -115,6 +114,9 @@ always @(posedge clk) begin
 		end
 	end
 end
+
+assign cycle_tick = (cycle_counter == counter_th);
+
 
 reg [7:0] packet_count = 8'h0;
 
@@ -202,12 +204,12 @@ always @(*) begin
 
 end
 
-reg [15:0] idle_cyle_num;
+reg [15:0] idle_cyle_num = 16'b0;
 wire  idle_cylce; assign  idle_cylce =  (idle_cyle_num == idle_counter_number_th) & debug_enable;
 always @(posedge clk ) begin
 	if (reset) begin
 		idle_cyle_num <= 16'b0;		
-	end	else if(cycle_counter == start_point)begin
+	end	else if((cycle_counter == start_point)&(debug_enable)) begin
 		idle_cyle_num <= ((|channel_not_empty) | idle_cylce) ? 16'b0 : idle_cyle_num + 16'b1;
 	end 
 end

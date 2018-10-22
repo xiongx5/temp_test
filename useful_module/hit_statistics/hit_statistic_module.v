@@ -19,7 +19,8 @@ module hit_statistic_module(
 	input start,
 
 	output reg ready,
-	output reg [19:0] count_out
+	output reg [19:0] count_out,
+	output debug
 	);
 
 reg start_r=1'b0;
@@ -77,7 +78,7 @@ always @(posedge clk40M ) begin
 		ready <= 1'b1;
 	end
 end
-
+assign debug = counter_enbale;
    hit_stastic_ila hit_stastic_inst (
     .clk(clk40M), // input wire clk
 
