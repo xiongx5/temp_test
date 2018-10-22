@@ -45,7 +45,7 @@ wire [11:0] BCID;
 assign BCID= pad_data_in[115:104];
 assign  data_valid = hit_flag&pad_data_valid;
 assign  data_out= pad_data_in;
-assign  data_valid_flag= hit_flag;
+assign  data_valid_flag= hit_flag & linked;
 // ila_pad_data_check ila_pad_data_check_inst (
 //  .clk(clk160), // input wire clk
 //  .probe0(pad_data_in), // input wire 116 probe0

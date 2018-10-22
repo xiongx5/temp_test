@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : strip_pad_data_decoder.v
 //  Created On    : 2018-10-01 10:28:08
-//  Last Modified : 2018-10-18 21:12:31
+//  Last Modified : 2018-10-22 14:21:22
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan

@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-22 11:18:02
+//  Last Modified : 2018-10-22 14:12:57
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -376,15 +376,12 @@ module sTGC_TDS_data_log(
 	);
 
 
-	trigger_match_monitor your_instance_name (
+	trigger_match_monitor trigger_match_monitor_inst (
 		.clk(clk160), // input wire clk
 	
 	
 		.probe0(trigger), // input wire [0:0]  probe0  
-		.probe1(data_valid_flag[3]), // input wire [0:0]  probe1 
-		.probe2(data_valid_flag[2]), // input wire [0:0]  probe2 
-		.probe3(data_valid_flag[1]), // input wire [0:0]  probe3 
-		.probe4(data_valid_flag[0]) // input wire [0:0]  probe4
+		.probe1(data_valid_flag) // input wire [3:0]  probe1 
 	);
 
 endmodule
