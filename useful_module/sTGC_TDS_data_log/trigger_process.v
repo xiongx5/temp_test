@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : trigger_process.v
 //  Created On    : 2018-10-10 21:41:12
-//  Last Modified : 2018-10-22 11:16:29
+//  Last Modified : 2018-10-22 11:58:14
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -34,12 +34,12 @@ module trigger_process(
    );
    wire trigger_start;
    reg  enable=1'b1;
-   reg enable_1=1'b1;
+   reg enable_1=1'b0;
    always @(posedge clk) begin
         if(trigger_start)begin
           enable <= 1'b0;
           enable_1 <= 1'b0; 
-        end else if(cycle_tick) begin
+        end else if(cycle_tick & ~enable) begin
           enable_1 <= 1'b1;
         end  else if(cycle_tick & enable_1) begin
           enable <= 1'b1; 
