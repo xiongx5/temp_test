@@ -39,7 +39,8 @@ module trigger_process(
         if(trigger_start)begin
           enable <= 1'b0;
           enable_1 <= 1'b0; 
-        end else if(cycle_tick & ~enable) begin
+        end else if(cycle_tick & ~enable & ~enable_1) begin
+          enable <= 1'b0;
           enable_1 <= 1'b1;
         end  else if(cycle_tick & enable_1) begin
           enable <= 1'b1; 
