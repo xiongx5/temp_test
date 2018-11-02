@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : strip_trigger_gen.v
 //  Created On    : 2018-09-29 15:09:43
-//  Last Modified : 2018-09-29 20:29:52
+//  Last Modified : 2018-11-01 15:32:44
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -41,14 +41,14 @@ wire [11:0] trigger_content_BCID_VIO;
 wire [4:0] phi_id_VIO;
 wire [7:0] bandid_VIO;
 wire load_VIO;
-// assign  trigger_content_BCID  = enable_VIO ? trigger_content_BCID_VIO : trigger_content_BCID_input;
-// assign  phi_id                = enable_VIO ? phi_id_VIO               : phi_id_input;
-// assign  bandid                = enable_VIO ? bandid_VIO               : bandid_input;
-// assign  load                  = enable_VIO ? load_VIO                 : load_input;
-assign  trigger_content_BCID  = trigger_content_BCID_input;
-assign  phi_id                = phi_id_input;
-assign  bandid                = bandid_input;
-assign  load                  = load_input;
+assign  trigger_content_BCID  = enable_VIO ? trigger_content_BCID_VIO : trigger_content_BCID_input;
+assign  phi_id                = enable_VIO ? phi_id_VIO               : phi_id_input;
+assign  bandid                = enable_VIO ? bandid_VIO               : bandid_input;
+assign  load                  = enable_VIO ? load_VIO                 : load_input;
+// assign  trigger_content_BCID  = trigger_content_BCID_input;
+// assign  phi_id                = phi_id_input;
+// assign  bandid                = bandid_input;
+// assign  load                  = load_input;
 
 reg [1:0] load_r;
 always @(posedge clk_slow or posedge reset) begin
@@ -127,13 +127,13 @@ ODDR_bus ODDR_bus_trig(
     );
 
 
-// vio_strip_trigger_gen vio_strip_trigger_gen_inst(
-//     .clk(clk_slow),
-//     .probe_out0(enable_VIO),//1
-//     .probe_out1(trigger_content_BCID_VIO),//12
-//     .probe_out2(bandid_VIO),//8
-//     .probe_out3(phi_id_VIO),//5
-//     .probe_out4(load_VIO)//1
-//     );
+vio_strip_trigger_gen vio_strip_trigger_gen_inst(
+    .clk(clk_slow),
+    .probe_out0(enable_VIO),//1
+    .probe_out1(trigger_content_BCID_VIO),//12
+    .probe_out2(bandid_VIO),//8
+    .probe_out3(phi_id_VIO),//5
+    .probe_out4(load_VIO)//1
+    );
 
 endmodule

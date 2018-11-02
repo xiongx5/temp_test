@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : strip_pad_data_decoder.v
 //  Created On    : 2018-10-01 10:28:08
-//  Last Modified : 2018-10-22 14:21:22
+//  Last Modified : 2018-11-01 17:41:38
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -39,16 +39,19 @@ module strip_pad_data_decoder(
     output [9:0] channel_data_counter,
     output channel_fifo_empty,
 
+
+    output [115:0] pad_data_out,
+    output pad_data_valid_out,
     output [119:0] debug_statistic_port
     );
 
-reg [639:0] GTP_data_in_delay;
-always @(posedge data_clk) begin
-  GTP_data_in_delay <= {GTP_data_in_delay[619:0],GTP_data_in};
-end
-wire [19:0] GTP_data_delay;
-assign GTP_data_delay = GTP_data_in_delay[639:620];
-
+// reg [639:0] GTP_data_in_delay;
+// always @(posedge data_clk) begin
+//   GTP_data_in_delay <= {GTP_data_in_delay[619:0],GTP_data_in};
+// end
+ wire [19:0] GTP_data_delay;
+// assign GTP_data_delay = GTP_data_in_delay[639:620];
+assign GTP_data_delay = GTP_data_in;
 
 
   wire [3:0] strip_state;
@@ -97,8 +100,8 @@ assign GTP_data_delay = GTP_data_in_delay[639:620];
   );
 
 
-  wire [115:0]pad_data;
-  wire pad_data_valid;
+  wire [115:0]pad_data; assign pad_data_out = pad_data;
+  wire pad_data_valid; assign  pad_data_valid_out = pad_data_valid;
   wire [18:0] pad_link_message;
 
   wire [3:0] pad_state;
@@ -106,6 +109,7 @@ assign GTP_data_delay = GTP_data_in_delay[639:620];
   wire [4:0] pad_err_cnt;
 
   wire pad_data_valid_inner;
+  wire pad_data_valid_flag;
   wire [115:0] pad_data_inner;
   wire [119:0] pad_data_bridge;
   deserial_pad_data  deserial_pad_data_inst(
@@ -135,7 +139,7 @@ assign GTP_data_delay = GTP_data_in_delay[639:620];
 
       .data_valid(pad_data_valid_inner),
       .data_out(pad_data_inner),
-      .data_valid_flag(data_valid_flag)
+      .data_valid_flag(pad_data_valid_flag)
   );
 
   bridge_fifo pad_bridge_fifo (
@@ -167,6 +171,7 @@ assign GTP_data_delay = GTP_data_in_delay[639:620];
     .data_count({channel_data_counter_idle,channel_data_counter})  // output wire [10 : 0] data_count
   );
 
+assign data_valid_flag = tds_mode ? 1'b0 : pad_data_valid_flag;
 
   strip_pad_data_decoder_ila strip_pad_data_decoder_ila_inst (
     .clk(clk_readout), // input wire clk

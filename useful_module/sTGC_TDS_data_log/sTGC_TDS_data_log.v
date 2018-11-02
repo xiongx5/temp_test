@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : sTGC_TDS_data_log.v
 //  Created On    : 2018-10-03 17:47:24
-//  Last Modified : 2018-10-22 14:12:57
+//  Last Modified : 2018-11-01 16:05:58
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -54,13 +54,18 @@ module sTGC_TDS_data_log(
     input trigger_in_p,
     input trigger_in_n,
 
+    output trig_clk_p,trig_clk_n,
+    output trig_en_p, trig_en_n,
+    output trig_d0_p,trig_d0_n,
+    output trig_d1_p,trig_d1_n,
+
     output reg [4:0] debug_port
 );
 
 
 
 
-
+	wire clk320;
 	wire clk160;
 	wire clk40;
 	
@@ -79,7 +84,9 @@ module sTGC_TDS_data_log(
 	  .clk_in1_n(clk_in_40M_n),    // input clk_in1_n
 	  // Clock out ports
 	  .clk_out1(clk40),     // output clk_out1
-	  .clk_out2(clk160));    // output clk_out2
+	  .clk_out2(clk160),// output clk_out2
+	  .clk_out3(clk320)// output clk_out3
+	  );    
 
 
 	wire enable_trigger_VIO;
@@ -142,6 +149,10 @@ module sTGC_TDS_data_log(
     wire [3:0] channel_linked;
 
     wire [119:0] debug_statistic_port_3,debug_statistic_port_2,debug_statistic_port_1,debug_statistic_port_0;
+
+    wire [115:0] pad_data_3,pad_data_2,pad_data_1,pad_data_0;
+    wire pad_data_valid_3,pad_data_valid_2,pad_data_valid_1,pad_data_valid_0;
+
 	channel_data_4 inst_channel_data_4		(
 			.GTP_CLK_p              (GTP_CLK_p),
 			.GTP_CLK_n              (GTP_CLK_n),
@@ -172,6 +183,8 @@ module sTGC_TDS_data_log(
 			.channel_data_0         (channel_data_0),
 			.channel_data_counter_0 (channel_data_counter_0),
 			.channel_fifo_empty_0   (channel_fifo_empty_0),
+    		.pad_data_0             (pad_data_0),
+    		.pad_data_valid_0		(pad_data_valid_0),
 			.debug_statistic_port_0 (debug_statistic_port_0),
 
 			.channel_fifo_s_reset_1 (channel_fifo_s_reset_1),
@@ -180,6 +193,8 @@ module sTGC_TDS_data_log(
 			.channel_data_1         (channel_data_1),
 			.channel_data_counter_1 (channel_data_counter_1),
 			.channel_fifo_empty_1   (channel_fifo_empty_1),
+			.pad_data_1             (pad_data_1),
+    		.pad_data_valid_1		(pad_data_valid_1),
 			.debug_statistic_port_1 (debug_statistic_port_1),
 
 			.channel_fifo_s_reset_2 (channel_fifo_s_reset_2),
@@ -188,6 +203,8 @@ module sTGC_TDS_data_log(
 			.channel_data_2         (channel_data_2),
 			.channel_data_counter_2 (channel_data_counter_2),
 			.channel_fifo_empty_2   (channel_fifo_empty_2),
+			.pad_data_2             (pad_data_2),
+    		.pad_data_valid_2		(pad_data_valid_2),
 			.debug_statistic_port_2 (debug_statistic_port_2),
 
 			.channel_fifo_s_reset_3 (channel_fifo_s_reset_3),
@@ -196,8 +213,13 @@ module sTGC_TDS_data_log(
 			.channel_data_3         (channel_data_3),
 			.channel_data_counter_3 (channel_data_counter_3),
 			.channel_fifo_empty_3   (channel_fifo_empty_3),
+			.pad_data_3             (pad_data_3),
+    		.pad_data_valid_3		(pad_data_valid_3),
 			.debug_statistic_port_3 (debug_statistic_port_3)
 		);
+
+
+
 
 
     wire [7:0]  tx_axis_fifo_tdata;
@@ -383,5 +405,29 @@ module sTGC_TDS_data_log(
 		.probe0(trigger), // input wire [0:0]  probe0  
 		.probe1(data_valid_flag) // input wire [3:0]  probe1 
 	);
+
+	strip_trigger_info_generator inst_strip_trigger_info_generator(
+			.clk              (clk160),
+			.clk320M          (clk320),
+			.reset            (reset_VIO),
+			.pad_data_3       (pad_data_3),
+			.pad_data_valid_3 (pad_data_valid_3),
+			.pad_data_2       (pad_data_2),
+			.pad_data_valid_2 (pad_data_valid_2),
+			.pad_data_1       (pad_data_1),
+			.pad_data_valid_1 (pad_data_valid_1),
+			.pad_data_0       (pad_data_0),
+			.pad_data_valid_0 (pad_data_valid_0),
+			.trig_clk_p       (trig_clk_p),
+			.trig_clk_n       (trig_clk_n),
+			.trig_en_p        (trig_en_p),
+			.trig_en_n        (trig_en_n),
+			.trig_d0_p        (trig_d0_p),
+			.trig_d0_n        (trig_d0_n),
+			.trig_d1_p        (trig_d1_p),
+			.trig_d1_n        (trig_d1_n)
+		);
+
+
 
 endmodule
