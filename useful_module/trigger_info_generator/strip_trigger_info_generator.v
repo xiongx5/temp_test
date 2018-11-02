@@ -176,10 +176,10 @@ bram_data_serial_inst[3:0]
 
 pad_mask_VIO pad_mask_VIO_inst (
   .clk(clk),                  // input wire clk
-  .probe_in0(pad_data_mask_0[255:0]),      // input wire [255 : 0] probe_in0
-  .probe_in1(pad_data_mask_1[255:0]),      // input wire [255 : 0] probe_in1
-  .probe_in2(pad_data_mask_2[255:0]),      // input wire [255 : 0] probe_in2
-  .probe_in3(pad_data_mask_3[255:0]),      // input wire [255 : 0] probe_in3
+  .probe_in0(pad_data_mask_0[7:0]),      // input wire [255 : 0] probe_in0
+  .probe_in1(pad_data_mask_1[7:0]),      // input wire [255 : 0] probe_in1
+  .probe_in2(pad_data_mask_0[1023:1016]),      // input wire [255 : 0] probe_in2
+  .probe_in3(pad_data_mask_1[1023:1016]),      // input wire [255 : 0] probe_in3
 
   .probe_in4(lut_ram_busy_0_VIO),      // input wire [255 : 0] probe_in3
   .probe_in5(lut_ram_busy_1_VIO),      // input wire [255 : 0] probe_in3
