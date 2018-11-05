@@ -154,5 +154,19 @@ link_alignment_VIO link_alignment_VIO_inst (
   .probe_out0(ref_TDS_select_VIO)     // output wire [2 : 0] probe_out0
 );
 
+
+ila_link_alignment ila_link_alignment_inst (
+	.clk(clk), // input wire clk
+
+
+	.probe0(pad_data_valid_out), // input wire [1:0]  probe0  
+	.probe1(pad_data_0_aligned), // input wire [0:0]  probe1 
+	.probe2(pad_data_1_aligned), // input wire [0:0]  probe2 
+	.probe3(pad_data_2_aligned), // input wire [8:0]  probe3 
+	.probe4(pad_data_3_aligned), // input wire [8:0]  probe3 
+	.probe5(bcid)
+);
+
+
 endmodule
 
