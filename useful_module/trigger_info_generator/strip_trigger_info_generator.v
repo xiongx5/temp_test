@@ -256,6 +256,19 @@ other_VIO other_VIO_inst (
   .probe_out3(pad_matched_map_VIO)
 );
 
+ila_strip_info ila_strip_info_inst (
+	.clk(clk), // input wire clk
+
+
+	.probe0(bcid_r), // input wire [11:0]  probe0  
+	.probe1(band_id_r), // input wire [7:0]  probe1 
+	.probe2(load_r), // input wire [0:0]  probe2 
+	.probe3(pad_data_0_aligned[103:0]), // input wire [103:0]  probe3 
+	.probe4(pad_data_1_aligned[103:0]), // input wire [103:0]  probe3 
+	.probe5(pad_data_2_aligned[103:0]), // input wire [103:0]  probe3 
+	.probe6(pad_data_3_aligned[103:0]) // input wire [103:0]  probe3 	
+);
+
 
 
 endmodule 
