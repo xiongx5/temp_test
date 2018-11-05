@@ -61,4 +61,24 @@ always @(posedge clk)begin
 	pad_data_valid_out <= pad_data_valid;
 end
 
+ila_pad_data_window_syn ila_pad_data_window_syn_inst (
+	.clk(clk), // input wire clk
+
+
+	.probe0(pad_data), // input wire [1:0]  probe0  
+	.probe1(pad_data_valid), // input wire [0:0]  probe1 
+	.probe2(match_window), // input wire [0:0]  probe2 
+	.probe3(pad_data_syn), // input wire [8:0]  probe3 
+	.probe4(pad_data_valid_out), // input wire [1023:0]  probe4
+	.probe5(pad_hit_clear), // input wire [1023:0]  probe4
+	.probe6(pad_data_r_0), // input wire [1023:0]  probe4
+	.probe7(pad_data_r_1), // input wire [1023:0]  probe4
+	.probe8(pad_data_r_2), // input wire [1023:0]  probe4
+	.probe9(pad_data_r_3), // input wire [1023:0]  probe4
+	.probe10(pad_data_r_4), // input wire [1023:0]  probe4
+	.probe11(pad_data_r_5), // input wire [1023:0]  probe4
+	.probe12(pad_data_r_6), // input wire [1023:0]  probe4
+    .probe13(pad_data_r_7) // input wire [1023:0]  probe4
+);
+
 endmodule

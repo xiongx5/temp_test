@@ -338,37 +338,37 @@ module sTGC_TDS_data_log(
 
 
 
-	wire tick;
-	reg  hit_statistic;
-	wire hit_mask;
-	wire start_VIO;
-	wire reset_40_VIO;
-	wire statistic_ready_VIO;
-	wire [19:0] count_out_VIO;
-	wire [19:0] windows_VIO;
+//	wire tick;
+//	reg  hit_statistic;
+//	wire hit_mask;
+//	wire start_VIO;
+//	wire reset_40_VIO;
+//	wire statistic_ready_VIO;
+//	wire [19:0] count_out_VIO;
+//	wire [19:0] windows_VIO;
 	
-	slow_tick_generator inst_slow_tick_generator (.clk40M(clk40), .windows(windows_VIO), .tick(tick));
-	hit_statistic_module inst_hit_statistic_module		(
-			.clk40M    (clk40),
-			.reset     (reset_40_VIO),
-			.tick      (tick),
-			.hit       (hit_statistic),
-			.start     (start_VIO),
-			.ready     (statistic_ready_VIO),
-			.count_out (count_out_VIO),
-			.debug     (debug_for_enable)
-		);
-	wire [3:0] tds_select_VIO;
-	wire [103:0] channel_select_VIO;
-	reg  [103:0] debug_statistic_port_3_r,debug_statistic_port_2_r,debug_statistic_port_1_r,debug_statistic_port_0_r;
+//	slow_tick_generator inst_slow_tick_generator (.clk40M(clk40), .windows(windows_VIO), .tick(tick));
+//	hit_statistic_module inst_hit_statistic_module		(
+//			.clk40M    (clk40),
+//			.reset     (reset_40_VIO),
+//			.tick      (tick),
+//			.hit       (hit_statistic),
+//			.start     (start_VIO),
+//			.ready     (statistic_ready_VIO),
+//			.count_out (count_out_VIO),
+//			.debug     (debug_for_enable)
+//		);
+//	wire [3:0] tds_select_VIO;
+//	wire [103:0] channel_select_VIO;
+//	reg  [103:0] debug_statistic_port_3_r,debug_statistic_port_2_r,debug_statistic_port_1_r,debug_statistic_port_0_r;
 
-	always @(posedge clk40 ) begin
-		debug_statistic_port_3_r <= channel_select_VIO & debug_statistic_port_3[103:0] & {103{tds_select_VIO[3]}};
-		debug_statistic_port_2_r <= channel_select_VIO & debug_statistic_port_2[103:0] & {103{tds_select_VIO[2]}};
-		debug_statistic_port_1_r <= channel_select_VIO & debug_statistic_port_1[103:0] & {103{tds_select_VIO[1]}};
-		debug_statistic_port_0_r <= channel_select_VIO & debug_statistic_port_0[103:0] & {103{tds_select_VIO[0]}};
-		hit_statistic  <= (|debug_statistic_port_3_r)|(|debug_statistic_port_2_r)|(|debug_statistic_port_1_r)|(|debug_statistic_port_0_r);
-	end
+//	always @(posedge clk40 ) begin
+//		debug_statistic_port_3_r <= channel_select_VIO & debug_statistic_port_3[103:0] & {103{tds_select_VIO[3]}};
+//		debug_statistic_port_2_r <= channel_select_VIO & debug_statistic_port_2[103:0] & {103{tds_select_VIO[2]}};
+//		debug_statistic_port_1_r <= channel_select_VIO & debug_statistic_port_1[103:0] & {103{tds_select_VIO[1]}};
+//		debug_statistic_port_0_r <= channel_select_VIO & debug_statistic_port_0[103:0] & {103{tds_select_VIO[0]}};
+//		hit_statistic  <= (|debug_statistic_port_3_r)|(|debug_statistic_port_2_r)|(|debug_statistic_port_1_r)|(|debug_statistic_port_0_r);
+//	end
 
 
 	
@@ -386,16 +386,16 @@ module sTGC_TDS_data_log(
 	  .probe_out9(trigger_width_VIO)//output wire [9 : 0] probe_out9
 	);
 
-	statistic_VIO statistic_VIO_top (
-	  .clk(clk40),                // input wire clk
-	  .probe_in0(statistic_ready_VIO),//input wire [0 : 0] probe_in0
-	  .probe_in1(count_out_VIO),//input wire [19 : 0] probe_in1
-	  .probe_out0(start_VIO),  // output wire [0 : 0] probe_out0
-	  .probe_out1(reset_40_VIO), //output wire [0 : 0] probe_out1
-	  .probe_out2(windows_VIO), //output wire [19 : 0] probe_out2
-	  .probe_out3(tds_select_VIO),//output wire [3 : 0] probe_out3
-	  .probe_out4(channel_select_VIO)//output wire [115: 0] probe_out4
-	);
+//	statistic_VIO statistic_VIO_top (
+//	  .clk(clk40),                // input wire clk
+//	  .probe_in0(statistic_ready_VIO),//input wire [0 : 0] probe_in0
+//	  .probe_in1(count_out_VIO),//input wire [19 : 0] probe_in1
+//	  .probe_out0(start_VIO),  // output wire [0 : 0] probe_out0
+//	  .probe_out1(reset_40_VIO), //output wire [0 : 0] probe_out1
+//	  .probe_out2(windows_VIO), //output wire [19 : 0] probe_out2
+//	  .probe_out3(tds_select_VIO),//output wire [3 : 0] probe_out3
+//	  .probe_out4(channel_select_VIO)//output wire [115: 0] probe_out4
+//	);
 
 
 	trigger_match_monitor trigger_match_monitor_inst (

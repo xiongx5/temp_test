@@ -174,17 +174,13 @@ bram_data_serial_inst[3:0]
 	.busy({lut_ram_busy_3_VIO,lut_ram_busy_2_VIO,lut_ram_busy_1_VIO,lut_ram_busy_0_VIO})
 );
 
-pad_mask_VIO pad_mask_VIO_inst (
+pad_mask_VIO pad_mask_VIO_inst (  
   .clk(clk),                  // input wire clk
-  .probe_in0(pad_data_mask_0[7:0]),      // input wire [255 : 0] probe_in0
-  .probe_in1(pad_data_mask_1[7:0]),      // input wire [255 : 0] probe_in1
-  .probe_in2(pad_data_mask_0[1023:1016]),      // input wire [255 : 0] probe_in2
-  .probe_in3(pad_data_mask_1[1023:1016]),      // input wire [255 : 0] probe_in3
 
-  .probe_in4(lut_ram_busy_0_VIO),      // input wire [255 : 0] probe_in3
-  .probe_in5(lut_ram_busy_1_VIO),      // input wire [255 : 0] probe_in3
-  .probe_in6(lut_ram_busy_2_VIO),      // input wire [255 : 0] probe_in3
-  .probe_in7(lut_ram_busy_3_VIO),      // input wire [255 : 0] probe_in3
+  .probe_in0(lut_ram_busy_0_VIO),      // input wire [255 : 0] probe_in3
+  .probe_in1(lut_ram_busy_1_VIO),      // input wire [255 : 0] probe_in3
+  .probe_in2(lut_ram_busy_2_VIO),      // input wire [255 : 0] probe_in3
+  .probe_in3(lut_ram_busy_3_VIO),      // input wire [255 : 0] probe_in3
 
   .probe_out0(wea_0_VIO),    // output wire [0 : 0] probe_out0
   .probe_out1(addr_0_data_VIO),    // output wire [8 : 0] probe_out1
@@ -258,5 +254,7 @@ other_VIO other_VIO_inst (
   .probe_out2(trigger_match_window_VIO),
   .probe_out3(pad_matched_map_VIO)
 );
+
+
 
 endmodule 

@@ -30,10 +30,9 @@ end
 reg busy_r = 1'b0;
 assign busy = busy_r;
 
+reg [8:0] count = 9'h1ff;assign adder = count;
 wire start_inner;
 assign start_inner = start_r[0] & ~start_r[1] & ~busy_r & (&count);
-
-reg [8:0] count = 9'h1ff;assign adder = count;
 always @(posedge clk) begin
 	if(start_inner)begin
 		count <= count - 9'b1;
@@ -54,16 +53,16 @@ always @(posedge clk) begin
 	end
 end
 
-ila_bram ila_bram_inst (
-	.clk(clk), // input wire clk
+//ila_bram ila_bram_inst (
+//	.clk(clk), // input wire clk
 
 
-	.probe0(start_r), // input wire [1:0]  probe0  
-	.probe1(busy_r), // input wire [0:0]  probe1 
-	.probe2(start_inner), // input wire [0:0]  probe2 
-	.probe3(count), // input wire [8:0]  probe3 
-	.probe4(data_out[15:0]) // input wire [1023:0]  probe4
-);
+//	.probe0(start_r), // input wire [1:0]  probe0  
+//	.probe1(busy_r), // input wire [0:0]  probe1 
+//	.probe2(start_inner), // input wire [0:0]  probe2 
+//	.probe3(count), // input wire [8:0]  probe3 
+//	.probe4(data_out[15:0]) // input wire [1023:0]  probe4
+//);
 
 
 endmodule
