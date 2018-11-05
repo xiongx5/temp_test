@@ -48,5 +48,13 @@ band_id_lut_VIO band_id_lut_VIO_inst (
   .probe_out2(lut_addr_VIO)  // output wire [8 : 0] probe_out2
 );
 
+ila_logic_pad_to_band_id ila_logic_pad_to_band_id_inst (
+	.clk(clk), // input wire clk
 
+
+	.probe0(logic_pad_hited), // input wire [127:0]  probe0  
+	.probe1(band_id), // input wire [7:0]  probe1 
+	.probe2(data_ready), // input wire [0:0]  probe2 
+	.probe3(logic_pad_hited_encoded) // input wire [8:0]  probe3 
+);
 endmodule      
