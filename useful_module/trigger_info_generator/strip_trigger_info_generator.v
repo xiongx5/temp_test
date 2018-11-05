@@ -1,7 +1,7 @@
 //==================================================================================================
 //  Filename      : strip_trigger_info_generator.v
 //  Created On    : 2018-10-29 11:56:48
-//  Last Modified : 2018-11-01 18:09:34
+//  Last Modified : 2018-11-05 16:13:15
 //  Revision      : 
 //  Author        : Yu Liang
 //  Company       : University of Michigan
@@ -85,7 +85,8 @@ wire [1023:0] pad_data_mask_0;
 wire [15:0] pad_matched_map_VIO;
 
 
-logic_pad_hit_generator logic_pad_hit_generator[127:0](
+//logic_pad_hit_generator logic_pad_hit_generator[127:0](
+logic_pad_hit_generator logic_pad_hit_generator[1:0](
 	.clk(clk),
 
 	.pad_matched_map(pad_matched_map_VIO),
@@ -93,19 +94,19 @@ logic_pad_hit_generator logic_pad_hit_generator[127:0](
 	.data_valid_in(|pad_data_valid_syn),
 
 	.pad_data_0(pad_data_syn_0),
-	.pad_data_mask_0(pad_data_mask_0),
+	.pad_data_mask_0(pad_data_mask_0[15:0]),
 	
 	.pad_data_1(pad_data_syn_1),
-	.pad_data_mask_1(pad_data_mask_1),
+	.pad_data_mask_1(pad_data_mask_1[15:0]),
 	
 	.pad_data_2(pad_data_syn_2),
-	.pad_data_mask_2(pad_data_mask_2),
+	.pad_data_mask_2(pad_data_mask_2[15:0]),
 	
 	.pad_data_3(pad_data_syn_3),
-	.pad_data_mask_3(pad_data_mask_3),
+	.pad_data_mask_3(pad_data_mask_3[15:0]),
 
-	.pad_hited(logic_pad_hited),
-	.pad_hited_clear(pad_hit_clear)
+	.pad_hited(logic_pad_hited[1:0]),
+	.pad_hited_clear(pad_hit_clear[1:0])
 	);
 
 wire [7:0] band_id;
