@@ -36,7 +36,7 @@ module strip_trigger_info_generator(
 
 wire [115:0] pad_data_3_aligned,pad_data_2_aligned,pad_data_1_aligned,pad_data_0_aligned;
 wire pad_data_valid;
-wire [2:0] bcid_select_VIO;
+wire [3:0] bcid_select_VIO;
 wire [11:0] bcid;
 	tds_link_latency_alignment inst_tds_link_latency_alignment
 		(

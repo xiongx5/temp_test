@@ -32,7 +32,7 @@ module tds_link_latency_alignment(
 
 	output reg pad_data_valid_out,
 	
-	input [2:0] bcid_select,
+	input [3:0] bcid_select,
 	output reg [11:0] bcid
 
 	);
@@ -72,20 +72,59 @@ always @(posedge clk) begin
 	end
 end
 
-always @(*) begin
-	if (bcid_select == 3'd0) begin
-		bcid = pad_data__0[115:104];
-	end else if (bcid_select == 3'd1) begin
-		bcid = pad_data__1[115:104];
-	end else if (bcid_select == 3'd2) begin
-		bcid = pad_data__2[115:104];
-	end else if (bcid_select == 3'd3) begin
-		bcid = pad_data__3[115:104];
-	end else if (bcid_select == 3'd4) begin
-		bcid = pad_data__4[115:104];
-	end  else begin
-		bcid = pad_data__2[115:104];
+reg [11:0] bcid_buf_0 ,bcid_buf_1, bcid_buf_2, bcid_buf_3,  bcid_buf_4 ,bcid_buf_5, bcid_buf_6, bcid_buf_7,bcid_buf_8,bcid_buf_9,bcid_buf_a; 
+always @(posedge clk) begin
+	if(pad_data_valid)begin
+        bcid_buf_0 <= pad_data__4[115:104];
+        bcid_buf_1 <= bcid_buf_0;
+        bcid_buf_2 <= bcid_buf_1;
+        bcid_buf_3 <= bcid_buf_2;
+        bcid_buf_4 <= bcid_buf_3;
+        bcid_buf_5 <= bcid_buf_4;
+        bcid_buf_6 <= bcid_buf_5;
+        bcid_buf_7 <= bcid_buf_6;
+        bcid_buf_8 <= bcid_buf_7;
+        bcid_buf_9 <= bcid_buf_8;
+        bcid_buf_a <= bcid_buf_9;
 	end
+end
+
+
+
+always @(*) begin
+	if (bcid_select == 4'd0) begin
+		bcid = pad_data__0[115:104];
+	end else if (bcid_select == 4'd1) begin
+		bcid = pad_data__1[115:104];
+	end else if (bcid_select == 4'd2) begin
+		bcid = pad_data__2[115:104];
+	end else if (bcid_select == 4'd3) begin
+		bcid = pad_data__3[115:104];
+	end else if (bcid_select == 4'd4) begin
+		bcid = pad_data__4[115:104];
+	end else if (bcid_select == 4'd5) begin
+		bcid = bcid_buf_0;
+	end else if (bcid_select == 4'd6) begin
+	   bcid = bcid_buf_1;
+	end else if (bcid_select == 4'd7) begin
+       bcid = bcid_buf_2;
+    end else if (bcid_select == 4'd8) begin
+       bcid = bcid_buf_3;
+    end else if (bcid_select == 4'd9) begin
+       bcid = bcid_buf_4;
+    end else if (bcid_select == 4'd10) begin
+       bcid = bcid_buf_5;
+    end else if (bcid_select == 4'd11) begin
+       bcid = bcid_buf_6;
+    end else if (bcid_select == 4'd12) begin
+       bcid = bcid_buf_7;
+    end else if (bcid_select == 4'd13) begin
+       bcid = bcid_buf_8;
+    end else if (bcid_select == 4'd14) begin
+       bcid = bcid_buf_9;
+    end else if (bcid_select == 4'd15) begin
+       bcid = bcid_buf_a;
+    end
 end
 
 
