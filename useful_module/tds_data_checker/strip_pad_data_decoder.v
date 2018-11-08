@@ -172,16 +172,19 @@ assign GTP_data_delay = GTP_data_in;
   );
 
 assign data_valid_flag = tds_mode ? 1'b0 : pad_data_valid_flag;
-
+wire linked; assign linked = tds_mode ? strip_linked:pad_linked;
+wire [115:0] raw_data; assign raw_data = tds_mode ? {86'b0,strip_data} : pad_data;
+wire [115:0] data_inner; assign data_inner = tds_mode ? {12'b0,strip_data_inner} : pad_data_inner;
+wire data_valid_inner; assign data_valid_inner = tds_mode ? strip_data_valid_inner : pad_data_valid_inner;
   strip_pad_data_decoder_ila strip_pad_data_decoder_ila_inst (
     .clk(clk_readout), // input wire clk
 
     .probe0(pad_linked), // input wire [0:0] probe0
     .probe1(pad_data_valid), // input wire [0:0] probe1
-    .probe2(pad_data_valid_inner), // input wire [0:0] probe2
+    .probe2(data_valid_inner), // input wire [0:0] probe2
     .probe3(data_tran_stop), // input wire [0:0] probe3
     .probe4(pad_empty), // input wire [0:0] probe4
-    .probe5(pad_linked), // input wire [0:0] probe5
+    .probe5(linked), // input wire [0:0] probe5
     .probe6(bridge_fifo_empty), // input wire [0:0] probe6
     .probe7(channel_fifo_write), // input wire [0:0] probe7
     .probe8(channel_data_read), // input wire [0:0] probe8
@@ -189,8 +192,8 @@ assign data_valid_flag = tds_mode ? 1'b0 : pad_data_valid_flag;
     .probe10(channel_data_counter), // input wire [9:0] prob10
     .probe11(channel_data_read), // input wire [0:0] probe11
 
-    .probe12(pad_data), // input wire [115:0] probe12
-    .probe13(pad_data_inner), // input wire [115:0] probe13
+    .probe12(raw_data), // input wire [115:0] probe12
+    .probe13(data_inner), // input wire [115:0] probe13
     .probe14(bridge_fifo_data), // input wire [119:0] probe14  
     .probe15(channel_data) // input wire [119:0] probe15
   );

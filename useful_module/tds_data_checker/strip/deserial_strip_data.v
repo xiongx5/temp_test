@@ -608,15 +608,16 @@ endfunction
 //   .probe7(data_out)//30
 // );
 
-// ila_strip_data_240M ila_strip_data_240M_inst (
-//   .clk(USER_CLK), // input wire clk
-//   .probe0(pos), // input wire [6:0] probe0
-//   .probe1(syn_cnt), // input wire [8:0] probe1
-//   .probe2(err_cnt),//input wire [4:0] probe1
-//   .probe3(s_cnt),//[2:0]
-//   .probe4(state),//[3:0]
-//   .probe5(tdsdata_r),//[119:0]
-//   .probe6(debug)
-// );
+ ila_strip_data_240M ila_strip_data_240M_inst (
+   .clk(USER_CLK), // input wire clk
+   .probe0(pos), // input wire [6:0] probe0
+   .probe1(syn_cnt), // input wire [8:0] probe1
+   .probe2(err_cnt),//input wire [4:0] probe1
+   .probe3(s_cnt),//[2:0]
+   .probe4(state),//[3:0]
+   .probe5(tdsdata_r),//[119:0]
+   .probe6(padtds_d1),
+   .probe7(rx_data_r1)
+ );
 
 endmodule   
