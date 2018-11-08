@@ -122,15 +122,15 @@ module GTP_Wrapper(
 //     .probe_out1(debug_data_in),  // output wire [31 : 0] probe_out1
 //     .probe_out2(debug_k)  // output wire [3 : 0] probe_out2
 //   );
-   ila_GTX ila_GTX_inst (
-       .clk(gt0_rxusrclk2_out), // input wire clk
+//   ila_GTX ila_GTX_inst (
+//       .clk(gt0_rxusrclk2_out), // input wire clk
    
    
-       .probe0(gt0_rxdata_out) // input wire [19:0]  probe0  
-//       .probe1(gt0_rxcharisk_out), // input wire [3:0]  probe1 
-//       .probe2(gt0_rxdisperr_out), // input wire [3:0]  probe2 
-//       .probe3(gt0_rxnotintable_out) // input wire [3:0]  probe3 
-   );
+//       .probe0(gt0_rxdata_out) // input wire [19:0]  probe0  
+////       .probe1(gt0_rxcharisk_out), // input wire [3:0]  probe1 
+////       .probe2(gt0_rxdisperr_out), // input wire [3:0]  probe2 
+////       .probe3(gt0_rxnotintable_out) // input wire [3:0]  probe3 
+//   );
       
         
     gtx_tds_4p8G_X0Y8  gtx_tds_4p8G_inst
@@ -138,8 +138,8 @@ module GTP_Wrapper(
      .soft_reset_tx_in(soft_reset_tx_in), // input wire soft_reset_tx_in
      .soft_reset_rx_in(soft_reset_rx_in), // input wire soft_reset_rx_in
      .dont_reset_on_data_error_in(dont_reset_on_data_error_in), // input wire dont_reset_on_data_error_in
-    .q3_clk1_gtrefclk_pad_n_in(q2_clk1_gtrefclk_pad_n_in), // input wire q2_clk1_gtrefclk_pad_n_in
-    .q3_clk1_gtrefclk_pad_p_in(q2_clk1_gtrefclk_pad_p_in), // input wire q2_clk1_gtrefclk_pad_p_in
+    .q2_clk1_gtrefclk_pad_n_in(q2_clk1_gtrefclk_pad_n_in), // input wire q2_clk1_gtrefclk_pad_n_in
+    .q2_clk1_gtrefclk_pad_p_in(q2_clk1_gtrefclk_pad_p_in), // input wire q2_clk1_gtrefclk_pad_p_in
      .gt0_tx_mmcm_lock_out(gt0_tx_mmcm_lock_out), // output wire gt0_tx_mmcm_lock_out
      //.gt0_rx_mmcm_lock_out(gt0_rx_mmcm_lock_out), // output wire gt0_rx_mmcm_lock_out
      .gt0_tx_fsm_reset_done_out(gt0_tx_fsm_reset_done_out), // output wire gt0_tx_fsm_reset_done_out
