@@ -73,7 +73,7 @@ end
     reg [103:0] frmdata_r=104'b0;
 
     always @(posedge clk160) begin
-        if(counter== counter_position+2'b01) begin
+        if(counter== counter_position) begin
             frmdata_r <= frmdata;
             data_valid <= head_before==4'b1010;
         end else begin

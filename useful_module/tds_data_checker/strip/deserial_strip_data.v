@@ -596,29 +596,29 @@ endfunction
         end
     end
 
- ila_strip_data_160M ila_strip_data_160M_inst (
-   .clk(clk160), // input wire clk
-   .probe0(count_160M), // input wire [1:0] probe0
-   .probe1(link_message), // input wire [18:0] probe1
-   .probe2(tdsdata_r_160M), //[119:0]
-   .probe3(tdsdata_packet_r_160M),//[29:0]
-   .probe4(header),//4
-   .probe5(frmdata),//104
-   .probe6(frmdata_r),//104
-   .probe7(data_out),//30
-   .probe8(syn_fifo_empty)
- );
+// ila_strip_data_160M ila_strip_data_160M_inst (
+//   .clk(clk160), // input wire clk
+//   .probe0(count_160M), // input wire [1:0] probe0
+//   .probe1(link_message), // input wire [18:0] probe1
+//   .probe2(tdsdata_r_160M), //[119:0]
+//   .probe3(tdsdata_packet_r_160M),//[29:0]
+//   .probe4(header),//4
+//   .probe5(frmdata),//104
+//   .probe6(frmdata_r),//104
+//   .probe7(data_out),//30
+//   .probe8(syn_fifo_empty)
+// );
 
- ila_strip_data_240M ila_strip_data_240M_inst (
-   .clk(USER_CLK), // input wire clk
-   .probe0(pos), // input wire [6:0] probe0
-   .probe1(syn_cnt), // input wire [8:0] probe1
-   .probe2(err_cnt),//input wire [4:0] probe1
-   .probe3(s_cnt),//[2:0]
-   .probe4(state),//[3:0]
-   .probe5(tdsdata_r),//[119:0]
-   .probe6(padtds_d1),
-   .probe7(rx_data_r1)
- );
+// ila_strip_data_240M ila_strip_data_240M_inst (
+//   .clk(USER_CLK), // input wire clk
+//   .probe0(pos), // input wire [6:0] probe0
+//   .probe1(syn_cnt), // input wire [8:0] probe1
+//   .probe2(err_cnt),//input wire [4:0] probe1
+//   .probe3(s_cnt),//[2:0]
+//   .probe4(state),//[3:0]
+//   .probe5(tdsdata_r),//[119:0]
+//   .probe6(padtds_d1),
+//   .probe7(rx_data_r1)
+// );
 
 endmodule   
