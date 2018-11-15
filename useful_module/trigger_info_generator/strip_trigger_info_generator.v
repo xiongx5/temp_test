@@ -269,11 +269,13 @@ ila_strip_info ila_strip_info_inst (
 
 	.probe0(bcid_r), // input wire [11:0]  probe0  
 	.probe1(band_id_r), // input wire [7:0]  probe1 
-	.probe2(load_r), // input wire [0:0]  probe2 
-	.probe3(pad_data_0_aligned), // input wire [115:0]  probe3 
-	.probe4(pad_data_1_aligned), // input wire [115:0]  probe3 
-	.probe5(pad_data_2_aligned), // input wire [115:0]  probe3 
-	.probe6(pad_data_3_aligned) // input wire [115:0]  probe3 	
+	.probe2(load_r), // input wire [0:0]  probe2
+	.probe3(data_ready),
+	.probe4(data_ready_extend),
+	.probe5(pad_data_0_aligned), // input wire [115:0]  probe3 
+	.probe6(pad_data_1_aligned), // input wire [115:0]  probe3 
+	.probe7(pad_data_2_aligned), // input wire [115:0]  probe3 
+	.probe8(pad_data_3_aligned) // input wire [115:0]  probe3 	
 );
 
 

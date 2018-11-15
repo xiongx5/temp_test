@@ -47,5 +47,13 @@ module data_ready_extend(
     
     );
     
+    ila_data_ready_extend ila_data_ready_extend_inst (
+        .clk(clk), // input wire clk
     
+    
+        .probe0(data_ready), // input wire [11:0]  probe0  
+        .probe1(data_ready_r), // input wire [7:0]  probe1 
+        .probe2(counter), // input wire [0:0]  probe2
+        .probe3(data_ready_extend)  
+    );
 endmodule
