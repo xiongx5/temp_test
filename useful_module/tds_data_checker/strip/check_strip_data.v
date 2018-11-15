@@ -84,17 +84,17 @@ end
 //assign frame_data = frmdata_r;
 //assign frame_data_valid = data_valid;
 
-ila_strip_data_check ila_strip_data_check_inst (
-  .clk(clk160), // input wire clk
-  .probe0(strip_data_in), // input wire 30 probe0
-  .probe1(link_message), // input wire 19 probe1
-  .probe2(frmdata),//104
-  .probe3(head_before),//4
-  .probe4(counter),//2
-  .probe5(counter_position),//2
-  .probe6(data_valid),//1
-  .probe7(frmdata_r)//104
-);
+//ila_strip_data_check ila_strip_data_check_inst (
+//  .clk(clk160), // input wire clk
+//  .probe0(strip_data_in), // input wire 30 probe0
+//  .probe1(link_message), // input wire 19 probe1
+//  .probe2(frmdata),//104
+//  .probe3(head_before),//4
+//  .probe4(counter),//2
+//  .probe5(counter_position),//2
+//  .probe6(data_valid),//1
+//  .probe7(frmdata_r)//104
+//);
 
 // wire clear_link_error;
 // wire clear_link_error_VIO;

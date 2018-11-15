@@ -214,6 +214,13 @@ always @(posedge clk) begin
 	count_for_160M <= count_for_160M + 2'b1;
 end
 
+wire data_ready_extend;
+data_ready_extend inst_data_ready_extend(
+  .clk(clk),
+  .data_ready(data_ready),    
+  .data_ready_extend(data_ready_extend)
+);
+
 reg [11:0] bcid_r;
 reg [7:0]  band_id_r;
 reg load_r;
@@ -221,7 +228,7 @@ always @(posedge clk) begin
 	if(&count_for_160M)begin
 		bcid_r <= bcid;
 		band_id_r <= band_id;
-		load_r <= data_ready;
+		load_r <= data_ready_extend;
 	end else begin
 		load_r <= 1'b0;
 	end
