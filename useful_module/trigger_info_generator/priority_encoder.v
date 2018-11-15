@@ -146,7 +146,7 @@ always @(posedge clk) begin
 	else if(data_in[125]) begin data_out <= 9'd125;end
 	else if(data_in[126]) begin data_out <= 9'd126;end
 	else if(data_in[127]) begin data_out <= 9'd127;end
-	else                  begin data_out <= 9'd0  ;end
+	else                  begin data_out <= data_out ;end
 end
 
 always @(posedge clk) begin
