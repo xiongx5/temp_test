@@ -39,7 +39,7 @@ module data_ready_extend(
         end
     end
     always@(posedge clk)begin
-        data_ready_extend <= (~data_ready_r&data_ready) | counter;
+        data_ready_extend <= (~data_ready_r&data_ready) | (|counter);
     end
     data_ready_extend_VIO data_ready_extend_VIO_inst(
     .clk(clk),                // input wire clk
